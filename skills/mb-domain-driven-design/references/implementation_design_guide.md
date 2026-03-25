@@ -13,7 +13,7 @@
 
 ## 出力の正本
 
-- API 設計は `openapi.yml` を正本とする。
+- API 設計は `implementation/openapi.yml` を正本とし、bounded context は tag で区切る。
 - DB 設計は `02_database/00_overview.md` の Mermaid ER 図と、各 table の詳細文書を正本とする。
 - 各 table 詳細では、少なくとも `| 物理名 | 説明 | データ型 | 備考 |` の表形式でカラム一覧を出す。
 - 非同期イベントや Webhook がある場合は、`03_async_contracts/00_overview.md` と各契約詳細を正本とする。
@@ -47,7 +47,7 @@
 
 ### OpenAPI として詰めること
 
-- path、method、operationId、tag をどう切るか。
+- path、method、operationId、tag をどう切るか。tag は原則 bounded context 単位にそろえる。
 - requestBody、parameter、response schema をどの名前で components 化するか。
 - security scheme と認可前提をどう表現するか。
 - example や enum、format をどこまで明記するか。

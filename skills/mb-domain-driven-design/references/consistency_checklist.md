@@ -61,7 +61,8 @@
 - 対象 bounded context の `domain_model` と `contexts` が揃う前に、API / DB 設計へ進んでいないか。
 - `implementation/00_overview.md` と各 context 配下の `00_overview.md` が最新で、API / DB 詳細ドキュメントを正しく案内できているか。
 - 実装向け設計で使う context 名、API 名、DB 名が宣言済みのシステム英語名と対応付いているか。
-- API 設計の正本として `01_api/openapi.yml` が存在し、主要な path / schema / error / security が追えるか。
+- API 設計の正本として `implementation/openapi.yml` が存在し、主要な path / schema / error / security が追えるか。
+- `implementation/openapi.yml` の tag が bounded context と対応し、対象 context の operation を迷わず追えるか。
 - API 設計から、どの ApplicationService / QueryService を呼ぶか追えるか。
 - API の request / response / error が caller の責務と一致しているか。
 - API の項目名がドメイン用語と異なる場合、その変換責務が説明されているか。

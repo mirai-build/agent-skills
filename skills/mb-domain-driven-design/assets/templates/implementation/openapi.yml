@@ -1,19 +1,19 @@
 openapi: 3.1.0
 info:
-  title: "[API 名]"
+  title: "[システム API 名]"
   version: "0.1.0"
   description: >
-    [この bounded context の API の目的を記入]
+    [implementation 配下で管理する API 全体の目的を記入]
 tags:
-  - name: [tag-name]
-    description: [役割を記入]
+  - name: [bounded-context-tag]
+    description: [この bounded context が担う API の役割を記入]
 servers:
   - url: https://api.example.com
 paths:
   /[resource]:
     get:
       tags:
-        - [tag-name]
+        - [bounded-context-tag]
       summary: [一覧取得などの要約]
       operationId: [operationId]
       parameters:

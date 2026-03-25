@@ -17,7 +17,7 @@ license: Apache-2.0
 - 実装 profile を決めてから動く。現在サポートしているのは TypeScript モノレポ構成だけで、`references/profiles/typescript-monorepo.md` を正本として扱う。
 - `packages/core` は framework 非依存、`packages/db` は Prisma / RDB の具体実装、`apps/api` は NestJS の runtime 入口として分離する。
 - controller と Prisma repository に業務判断を持ち込まない。業務ルールはまず `packages/core` に置く。
-- `implementation/01_api/openapi.yml` `implementation/02_database` `implementation/03_async_contracts` がある場合は、それぞれ API、永続化、非同期契約の一次情報として扱う。ただし `domain_model` や `contexts` の責務と矛盾していれば、そのまま実装せず先に不整合を解消する。
+- `implementation/openapi.yml` `implementation/NN_<bounded-context>/02_database` `implementation/NN_<bounded-context>/03_async_contracts` がある場合は、それぞれ API、永続化、非同期契約の一次情報として扱う。ただし API は対象 bounded context の tag を起点に読み、`domain_model` や `contexts` の責務と矛盾していれば、そのまま実装せず先に不整合を解消する。
 - 設計書で曖昧な点がある場合は、識別子、一貫性境界、状態遷移、永続化形、API 入出力、外部連携を優先して 1〜3 個ずつ質問する。質問観点は `references/implementation_questions.md` を使う。
 - 実装順は原則 `core -> db -> api` とし、export と test まで同じターンで揃える。
 - 実装中に `domain_model` `contexts` `implementation` の前提ずれが見つかったら、コードだけで吸収せず、どの文書へ差分を返すべきかを整理して報告する。
@@ -56,7 +56,7 @@ license: Apache-2.0
 - unit test は対象 module 近傍の `__tests__` へ colocate する。
 
 3. db 実装
-- `implementation/02_database` を正本として `packages/db/prisma/schema.prisma` に永続化モデルを反映し、必要なら migration / generate の更新方針を確認する。
+- `implementation/NN_<bounded-context>/02_database` を正本として `packages/db/prisma/schema.prisma` に永続化モデルを反映し、必要なら migration / generate の更新方針を確認する。
 - `00_overview.md` の ER 図、各 table 詳細、`contexts` の Aggregate / Repository 設計を突き合わせ、保存単位と transaction 境界が崩れないようにする。
 - `packages/db/src/client` に PrismaClient provider があるか確認し、必要に応じて transaction 共有や env 解決を揃える。
 - `packages/db/src/persistence/<context-or-aggregate>/` に Prisma repository を実装し、`packages/core` の Repository interface を満たす。
@@ -65,12 +65,12 @@ license: Apache-2.0
 
 4. api 実装
 - `apps/api/src/modules/<module-name>/` 配下に NestJS module と `presentation/http` `presentation/webhook` `presentation/batch` `presentation/worker` を必要な分だけ追加する。
-- `implementation/01_api/openapi.yml` がある場合は、それを API 契約の正本として route、request / response DTO、error response、security を合わせる。
+- `implementation/openapi.yml` がある場合は、対象 bounded context の tag を起点に API 契約を読み、route、request / response DTO、error response、security を合わせる。
 - controller は request / response 境界と service 呼び出しに集中し、業務判断や Prisma 操作を直接書かない。
 - module で concrete repository と app/query service を配線し、`apps/api/src/app.module.ts` を更新する。
 
 5. 非同期入口と外部連携の実装
-- `implementation/03_async_contracts` がある場合は、webhook / worker / batch の入口、署名検証、冪等性、retry 方針、delivery ID 管理などを設計書に合わせて実装する。
+- `implementation/NN_<bounded-context>/03_async_contracts` がある場合は、webhook / worker / batch の入口、署名検証、冪等性、retry 方針、delivery ID 管理などを設計書に合わせて実装する。
 - `contexts/07_domain_events` `08_external_integrations` だけがあり concrete 契約が未整備なら、外部 I/O 形状を推測で固定せず質問してから進める。
 - outbox や event 保存が必要なら、`core` `db` `api` のどこに責務を置くかを明示して実装する。
 
@@ -84,9 +84,9 @@ license: Apache-2.0
 - `domain_model` では用語、bounded context、上下流関係、共通概念を確定する。
 - `contexts` では ValueObject、Entity、Aggregate、Repository、Service、Interface をそのまま `core` の構成へ写像する。
 - `implementation/00_overview.md` では、その bounded context で今回どの入口と保存対象を実装するかを確定する。
-- `implementation/01_api/openapi.yml` は controller / DTO / 認可 / エラー応答の正本として読む。
-- `implementation/02_database` は Prisma schema、relation、unique 制約、監査項目の正本として読む。
-- `implementation/03_async_contracts` は webhook / event / worker の契約、冪等性、再送、署名検証の正本として読む。
+- `implementation/openapi.yml` は controller / DTO / 認可 / エラー応答の正本として読み、対象 bounded context の operation は tag で絞り込む。
+- `implementation/NN_<bounded-context>/02_database` は Prisma schema、relation、unique 制約、監査項目の正本として読む。
+- `implementation/NN_<bounded-context>/03_async_contracts` は webhook / event / worker の契約、冪等性、再送、署名検証の正本として読む。
 - `06_interfaces` にあるものは、API DTO、外部 gateway、repository contract、認可契約など、どの layer に置くべき interface かを見極める。
 - `07_domain_events` `08_external_integrations` がある context では、イベント発火点、非同期処理、外部 API adapter の切り分けを先に決める。
 - `implementation` の具体名が `domain_model` や `contexts` の用語とずれる場合は、どこで翻訳するかを明確にし、domain 内部の用語を崩さない。

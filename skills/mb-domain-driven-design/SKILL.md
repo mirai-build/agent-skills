@@ -18,7 +18,7 @@ license: Apache-2.0
 - 確定事項、仮置き、未確定事項を区別して記載する。仮置きで進める場合は、どこが仮説かを明示する。
 - 一覧の入口は各対象ディレクトリの `00_overview.md` とし、「一覧（概略）→ 詳細」の順で整理する。
 - `contexts` では bounded context ごとにディレクトリを分け、その下を `01_value_objects` `02_entities` `03_aggregates` `04_repositories` `05_services` `06_interfaces` のカテゴリ別ディレクトリに分ける。
-- 実装向け設計が必要な場合は `implementation` でも bounded context ごとにディレクトリを分け、その下を少なくとも `01_api` `02_database` のカテゴリ別ディレクトリに分ける。
+- 実装向け設計が必要な場合は `implementation` でも bounded context ごとにディレクトリを分ける。ただし API 設計の正本は context ごとに分割せず、`implementation/openapi.yml` に集約し、context は tag で区切る。
 - `domain_model` 配下は `01_system_purpose` `02_actors` `03_usecases` `04_journeys` `05_bounded_contexts` の順で整理する。各段階はディレクトリを分け、原則「`00_overview.md` → 詳細文書」の形にそろえる。
 - ユースケースは `03_usecases/00_overview.md` と `01_*.md` を正本とし、`contexts` や `implementation` の前提として扱う。
 - アクター定義は `02_actors/00_overview.md` に集約し、個別詳細ファイルへ分割しない。
@@ -125,11 +125,12 @@ license: Apache-2.0
 4. 実装向け設計
 - このフェーズへ進むのは、対象 bounded context の `domain_model` と `contexts` が揃い、ApplicationService、QueryService、Repository、Aggregate の責務が追える場合に限る。
 - 実装まで見据えた設計が必要な場合は、`docs/designs/implementation/00_overview.md` を作成または更新し、どの bounded context で API / DB 設計まで作るかを一覧化する。
+- API 設計の正本が必要な場合は、`docs/designs/implementation/openapi.yml` を作成または更新し、bounded context ごとの API を tag で整理する。
 - `docs/designs/implementation/` では、bounded context ごとに `NN_<bounded-context>/` ディレクトリを作成する。
 - 1 回の作業対象は原則 1 bounded context に限定し、必要な API / DB 設計から順に追加する。
 - 各 implementation context ディレクトリでは、まず `assets/templates/implementation/context_template/00_overview.md` をもとに `docs/designs/implementation/NN_<bounded-context>/00_overview.md` を作成または更新し、その context の実装対象、入口、保存対象、関連文書を一覧で整理する。
-- 続いて、同じ implementation context ディレクトリ配下に少なくとも `01_api` `02_database` を作成する。非同期イベントや Webhook がある場合は `03_async_contracts` も追加する。batch、worker、read model、運用設計など追加の実装観点が必要なら `04_<topic>` 以降の任意カテゴリを追加してよい。
-- `01_api` では `assets/templates/implementation/context_template/01_api/00_overview.md` と `openapi.yml` を使い、API 設計の正本を `docs/designs/implementation/NN_<bounded-context>/01_api/openapi.yml` として出力する。`openapi.yml` には少なくとも path、operation、request / response schema、error response、security、主要な example を含める。
+- 続いて、`docs/designs/implementation/openapi.yml` を `assets/templates/implementation/openapi.yml` から作成または更新し、対象 context の operation を tag 単位で追加する。同じ implementation context ディレクトリ配下には少なくとも `02_database` を作成し、非同期イベントや Webhook がある場合は `03_async_contracts` も追加する。batch、worker、read model、運用設計など追加の実装観点が必要なら `04_<topic>` 以降の任意カテゴリを追加してよい。
+- `openapi.yml` では bounded context ごとに tag を定義し、各 operation に対応する tag を必ず 1 つ以上付ける。少なくとも path、operation、request / response schema、error response、security、主要な example を含める。
 - `02_database` では `assets/templates/implementation/context_template/02_database/00_overview.md` と `01_table.md` を使い、`00_overview.md` に Mermaid の ER 図を載せ、各 table の詳細を `01_<table-name>.md` で分割管理する。各 table 詳細では、`| 物理名 | 説明 | データ型 | 備考 |` の表形式でカラム一覧を必ず出力する。
 - 非同期イベントや Webhook がある場合は `03_async_contracts` に `assets/templates/implementation/context_template/03_async_contracts/00_overview.md` と `01_contract.md` を使い、送信 / 受信契約ごとに topic / endpoint、payload、署名や認証、再送、冪等性、順序保証、失敗時の扱いを整理する。
 - 実装向け設計で出てきた API 名、DB 名、外部契約名がユビキタス言語と異なる場合は、その対応関係を明示する。
@@ -161,7 +162,7 @@ license: Apache-2.0
 - `contexts` や `implementation` ではユースケースやユーザージャーニー全文を重複させず、必要な文書への Markdown リンクで参照する。
 - 実装向け設計の API / DB 文書では、関連する ApplicationService、QueryService、Repository、Aggregate の設計書への Markdown リンクを貼る。
 - ユビキタス言語を定義する文書では、日本語名とシステム英語名を対で記載する。英語名は原則 2 語以内とし、例外が必要な場合は理由を残す。
-- API 設計の正本は `openapi.yml` とし、Markdown だけで API 詳細を済ませない。
+- API 設計の正本は `implementation/openapi.yml` とし、Markdown だけで API 詳細を済ませない。bounded context は tag で区切る。
 - DB 設計では `00_overview.md` に Mermaid の ER 図を載せ、各 table 詳細では `| 物理名 | 説明 | データ型 | 備考 |` の表形式でカラム一覧を出す。
 - 非同期イベントや Webhook があるシステムでは `03_async_contracts` を追加し、契約ごとに payload、認証 / 署名、再送、冪等性、失敗時の扱いを明記する。
 - API の項目名や DB カラム名がドメイン内部の用語、または宣言済みのシステム英語名と異なるときは、その対応関係を文書中で説明する。
@@ -184,4 +185,4 @@ license: Apache-2.0
 - `assets/templates/contexts/context_template/`
   - 1 bounded context ディレクトリの中に `00_overview.md` とカテゴリ別ディレクトリを置き、その下で ValueObject から Service までを「一覧 → 短い詳細」、Interface を「一覧」、必要なら Domain Event と External Integration も追加できるテンプレート群。
 - `assets/templates/implementation/`
-  - `implementation/00_overview.md` を入口に、bounded context ごとの API / DB に加えて、必要なら非同期イベント / Webhook 契約も含む実装向け設計を「一覧 → 詳細」で整理するためのテンプレート群。
+  - `implementation/00_overview.md` と共有 `implementation/openapi.yml` を入口に、bounded context ごとの DB に加えて、必要なら非同期イベント / Webhook 契約も含む実装向け設計を「一覧 → 詳細」で整理するためのテンプレート群。

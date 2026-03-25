@@ -1,4 +1,4 @@
 interface:
-  display_name: "MB ドメイン駆動設計"
+  display_name: "ミライビルド ドメイン駆動設計"
   short_description: "DDD に沿って情報を引き出し、コア業務 / 支援業務の整理から bounded context ごとの設計書まで整備する"
   default_prompt: "$mb-domain-driven-design を使って、ユーザーへ必要情報を質問しながら `docs/designs/domain_model` `docs/designs/contexts` のドメイン駆動設計書を Markdown で段階的に作成して下さい。"

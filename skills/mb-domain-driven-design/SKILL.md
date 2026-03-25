@@ -1,6 +1,7 @@
 ---
 name: mb-domain-driven-design
 description: ドメイン駆動設計に沿って、ユーザーへ不足情報を質問しながら `docs/designs/domain_model` `docs/designs/contexts` の設計書を Markdown で段階的に整備するスキル。システムの目的整理、コア業務と支援業務の整理、必要に応じたサブドメイン分割、Mermaid のドメインモデル図、bounded context ごとの設計書をテンプレートベースで一貫して作成・更新したいときに使う。
+license: Apache-2.0
 ---
 
 # MB ドメイン駆動設計

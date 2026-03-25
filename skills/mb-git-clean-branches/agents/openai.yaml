@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド gitブランチ掃除"
+  short_description: "デフォルトブランチ基準で Git ブランチ掃除の候補確認と安全な削除を支援する"
+  default_prompt: "$mb-git-clean-branches を使って、デフォルトブランチ基準と GitHub の merged PR 判定で削除候補と除外対象を列挙し、同意を得たローカルまたはリモートのブランチだけを削除して下さい。"

@@ -1,6 +1,7 @@
 ---
-name: git-clean-merged-branches
+name: mb-git-clean-branches
 description: マージ済みの Git ブランチを安全に整理するためのスキル。ローカル・リモート両方のブランチを列挙し、既定ではリポジトリのデフォルトブランチを基準に、通常 merge に加えて GitHub 上で merged 済み PR の head SHA 一致も見て削除候補を判定する。完全一致の除外対象ブランチ (`main`, `master`, `staging`, `stage`, `stg`, `develop`, `dev`) と保護対象ブランチを除外し、削除候補と除外対象を一覧化してからユーザーの同意を得て削除するときに使う。
+license: Apache-2.0
 ---
 
 # git ブランチ掃除

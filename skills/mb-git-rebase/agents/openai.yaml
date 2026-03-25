@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド git rebase"
+  short_description: "GitHub/Bitbucket の PR 先判定付きで安全な rebase を支援する"
+  default_prompt: "$mb-git-rebase を使って、対象ブランチを指定した安全な rebase とコンフリクト解消を進め、未指定時は GitHub の PR 先を優先し、Bitbucket では比較候補を使いながら rebase 先を決めて下さい。"

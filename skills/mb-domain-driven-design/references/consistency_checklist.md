@@ -13,6 +13,8 @@
 ## 用語
 
 - 同じ概念に複数の呼び名を使っていないか。
+- 日本語名とシステム英語名が 1 対 1 で対応付いているか。
+- システム英語名が原則 2 語以内で、API 名、DB 名、コード識別子へ流用しやすい形になっているか。例外がある場合は理由が残っているか。
 - 画面、API、DB、業務現場で呼び名が異なる場合、その差分を説明できているか。
 - ユビキタス言語と Mermaid 図の要素名が一致しているか。
 
@@ -42,6 +44,7 @@
 ## コンテキスト設計
 
 - `domain_model/05_bounded_contexts` で bounded context 候補と主要用語が整理される前に、context 設計へ進んでいないか。
+- bounded context の日本語名とシステム英語名が、`contexts/NN_<bounded-context>/` のディレクトリ名と対応しているか。
 - ユースケースがある場合、各 context がどのユースケースを主に担うか説明できるか。
 - ユーザージャーニーがある場合、各 context がどのジャーニーのどの区間を担うか説明できるか。
 - 各コンテキスト設計が、どの Application Service、Query Service、Aggregate を使うか追えるか。
@@ -57,6 +60,7 @@
 
 - 対象 bounded context の `domain_model` と `contexts` が揃う前に、API / DB 設計へ進んでいないか。
 - `implementation/00_overview.md` と各 context 配下の `00_overview.md` が最新で、API / DB 詳細ドキュメントを正しく案内できているか。
+- 実装向け設計で使う context 名、API 名、DB 名が宣言済みのシステム英語名と対応付いているか。
 - API 設計の正本として `01_api/openapi.yml` が存在し、主要な path / schema / error / security が追えるか。
 - API 設計から、どの ApplicationService / QueryService を呼ぶか追えるか。
 - API の request / response / error が caller の責務と一致しているか。

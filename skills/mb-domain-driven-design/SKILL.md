@@ -35,6 +35,7 @@ license: Apache-2.0
 - 上流フェーズが変わったときは、影響を受ける下流フェーズへ必ず差分を波及させる。`domain_model` を更新したら関連する `contexts` と `implementation` を、`contexts` を更新したら関連する `implementation` を必ず見直す。
 - 図は特別な指定がない限り Mermaid を使う。1 枚で複雑になりすぎるときは bounded context ごとに分割する。
 - ユビキタス言語を守る。既存資料と別名が混在する場合は、どの用語を正とするか確認してから反映する。
+- 主要なユビキタス言語は、日本語名だけでなくシステム上で使う英語名も対で宣言する。英語名は原則 2 語以内の名詞句とし、API 名、DB 名、コード識別子へ流用しやすい形を優先する。
 
 ## 使う場面
 
@@ -101,7 +102,7 @@ license: Apache-2.0
 - `assets/templates/domain_model/05_bounded_contexts/00_overview.md` `01_context_split.md` `02_context_map.md` をもとに、bounded context 分割を `docs/designs/domain_model/05_bounded_contexts/` へ整理する。
 - イベントストーミングをそのまま実施できない場合でも、出来事、利用者の行動、ルール、例外、外部連携を時系列で引き出してからドメインを分類する。
 - 特にコア業務は、責務や用語が分かれるなら bounded context 候補まで具体化する。支援業務も独立した責務や用語がある場合は context 候補を切る。
-- 用語が増えてきたら `assets/templates/domain_model/99_glossary.md` をもとに `docs/designs/domain_model/99_glossary.md` を追加し、ユビキタス言語の正本を分けてもよい。
+- 用語が増えてきたら `assets/templates/domain_model/99_glossary.md` をもとに `docs/designs/domain_model/99_glossary.md` を追加し、日本語名とシステム英語名を対で管理するユビキタス言語の正本を分けてもよい。
 - 案件規模が大きい場合でも、基本は `01_system_purpose` `02_actors` `03_usecases` `04_journeys` `05_bounded_contexts` の 5 段階に沿って整理し、補助文書を足す場合はどの段階を支えるものか明記する。
 
 3. コンテキスト設計
@@ -159,10 +160,11 @@ license: Apache-2.0
 - ユーザージャーニーは感情や印象評価ではなく、関連ユースケースをつないだ簡易フローとして記述する。
 - `contexts` や `implementation` ではユースケースやユーザージャーニー全文を重複させず、必要な文書への Markdown リンクで参照する。
 - 実装向け設計の API / DB 文書では、関連する ApplicationService、QueryService、Repository、Aggregate の設計書への Markdown リンクを貼る。
+- ユビキタス言語を定義する文書では、日本語名とシステム英語名を対で記載する。英語名は原則 2 語以内とし、例外が必要な場合は理由を残す。
 - API 設計の正本は `openapi.yml` とし、Markdown だけで API 詳細を済ませない。
 - DB 設計では `00_overview.md` に Mermaid の ER 図を載せ、各 table 詳細では `| 物理名 | 説明 | データ型 | 備考 |` の表形式でカラム一覧を出す。
 - 非同期イベントや Webhook があるシステムでは `03_async_contracts` を追加し、契約ごとに payload、認証 / 署名、再送、冪等性、失敗時の扱いを明記する。
-- API の項目名や DB カラム名がドメイン内部の用語と異なるときは、その対応関係を文書中で説明する。
+- API の項目名や DB カラム名がドメイン内部の用語、または宣言済みのシステム英語名と異なるときは、その対応関係を文書中で説明する。
 - Mermaid 図はレビューしやすいように、要素名を日本語またはユビキタス言語で統一する。
 - ファイルを更新したときは、関連する他ドキュメントも確認して不整合を残さない。
 - 上流ドキュメントを更新したときは、影響を受ける下流ドキュメントを同じターンで確認し、必要な差分を必ず反映する。

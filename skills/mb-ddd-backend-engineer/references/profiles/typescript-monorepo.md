@@ -15,7 +15,7 @@
 ## 適用条件
 
 - 対象 repo が `apps/` と `packages/` を持つ TypeScript モノレポである。
-- `docs/designs/domain_model` `docs/designs/contexts` または同等の DDD 設計書が存在する。
+- `docs/designs/domain_model` `docs/designs/contexts` が存在し、API / DB / 非同期入口まで実装する場合は `docs/designs/implementation` も参照できる。
 - `core -> db -> api` の責務分離でバックエンドを実装したい。
 
 これに当てはまらない場合は、この profile を無理に流用せず、未対応として追加 profile の必要性を報告する。
@@ -39,6 +39,16 @@
 - 識別子の払い出し元。
 - 一貫性境界と transaction の範囲。
 - API の認可、エラー応答、外部連携。
+
+## 設計書の読み分け
+
+- `domain_model` は用語、bounded context 境界、上下流関係の正本として使う。
+- `contexts` は ValueObject、Entity、Aggregate、Repository、Service、Interface の正本として使う。
+- `implementation/00_overview.md` は今回その context でどの入口と保存対象を実装するかの正本として使う。
+- `implementation/01_api/openapi.yml` は HTTP API 契約の正本として使う。
+- `implementation/02_database` は Prisma schema と永続化制約の正本として使う。
+- `implementation/03_async_contracts` は webhook / event / worker 契約の正本として使う。
+- 具体契約が上位の責務定義と矛盾する場合は、どれか一方を黙って採用せず、不整合として解消してから実装する。
 
 ## ディレクトリ対応
 
@@ -114,6 +124,9 @@ apps/api/
 | Interface 一覧 | repository / gateway / shared contract / DTO のどれかを見極める | concrete 実装が必要なものだけ作る | request / response DTO、Nest 配線 |
 | Domain Event | event contract や発火点を置く | outbox や event 保存が必要ならここで扱う | webhook / worker の入口設計へ反映 |
 | External Integration | gateway interface を置く | DB だけで完結しない場合は原則ここに持ち込まない | 外部イベント受信口の配線を置く |
+| `implementation/01_api/openapi.yml` | domain に transport 都合を漏らさないための境界確認に使う | 原則触れない | controller、DTO、認可、error response の正本 |
+| `implementation/02_database` | Aggregate と Repository の保存責務確認に使う | Prisma model、relation、制約の正本 | 原則触れない |
+| `implementation/03_async_contracts` | event 発火点、gateway interface の切り分けに使う | outbox、delivery 記録、冪等性保存の要否を決める | webhook / worker / batch 入口の正本 |
 
 `08_external_integrations` に concrete adapter が必要な場合は、repo に既存の `packages/integration` 相当があるか確認する。
 ない場合は placement を決め打ちせず、まずユーザーへ確認する。
@@ -138,6 +151,11 @@ apps/api/
 - `apps/api/src/app.module.ts` に module を登録する。
 - controller に業務ロジック、Prisma 操作、複雑な DTO 再構成を書かない。
 
+4. 非同期入口と外部連携
+- `implementation/03_async_contracts` がある場合は、契約単位で webhook / worker / batch の入口を作る。
+- 署名検証、delivery ID、retry、冪等性は入口か persistence のどちらに責務を置くかを先に決める。
+- concrete adapter の置き場が既存 repo にない場合は、placement を決め打ちせず確認する。
+
 ## `packages/core` 実装ルール
 
 - framework 依存の import を持ち込まない。
@@ -161,6 +179,7 @@ apps/api/
 - webhook / batch / worker が不要なら空ディレクトリを作らない。
 - Nest token や interface は複数実装切り替えが本当に必要なときだけ導入する。
 - API 側の test は入口と配線の確認に絞り、業務ロジックの主戦場は `packages/core` `packages/db` に置く。
+- `openapi.yml` や async contract に書かれた transport 名を domain 内部へ漏らさない。
 
 ## 検証
 

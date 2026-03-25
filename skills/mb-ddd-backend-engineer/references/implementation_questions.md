@@ -2,6 +2,20 @@
 
 DDD 設計書から実装へ落とすとき、設計書だけでは足りない項目を確認するためのガイドである。
 一度に全部を聞かず、手戻りが少ない順に 1〜3 テーマずつ聞く。
+質問へ進む前に、対象 bounded context の `docs/designs/domain_model` `docs/designs/contexts` `docs/designs/implementation` を読み、どの論点が本当に未確定かを仕分ける。
+
+## 0. 設計書の不足と不整合
+
+まず、質問が必要なのか、それとも設計書間の不整合を解消すべきなのかを切り分ける。
+
+- `implementation/01_api/openapi.yml` はあるか。あるなら、route、request / response、error response、security はそこから読めるか。
+- `implementation/02_database` はあるか。あるなら、table、制約、監査項目、relation はそこから読めるか。
+- `implementation/03_async_contracts` はあるか。あるなら、topic / endpoint、payload、認証 / 署名、冪等性、再送方針はそこから読めるか。
+- `implementation` と `contexts` で、Aggregate 境界、Repository 責務、ApplicationService の完了点に食い違いがないか。
+- `domain_model` の用語と API / DB の具体名がずれている場合、どこで翻訳するかが決まっているか。
+
+理由:
+設計書ですでに答えがあるのに聞き直したり、不整合を抱えたまま実装したりしないため。
 
 ## 1. 完了点と対象範囲
 
@@ -43,6 +57,7 @@ ID 生成位置と状態遷移は domain model、schema、API すべてに影響
 
 read 要件は `query` と schema の形に直結する。
 
+- `implementation/02_database` の table 設計で足りない検索・集計要件はあるか。
 - 一覧取得、詳細取得、検索、並び替え、ページングは何が必要か。
 - unique 制約や複合キーはあるか。
 - JSON で保持してよい項目と、relation 化すべき項目は何か。
@@ -55,6 +70,7 @@ Prisma model と QueryService の形を先に合わせるため。
 
 設計書に `06_interfaces` があっても、API として何を返すかは不足しやすい。
 
+- `implementation/01_api/openapi.yml` で未確定の request / response schema や example はどこか。
 - API の caller は誰か。管理画面、外部システム、batch、worker のどれか。
 - request / response で最低限必要な項目は何か。
 - 認可は actor 単位か、organization 単位か、role 単位か。
@@ -67,6 +83,7 @@ controller、DTO、ApplicationError の扱いが変わるため。
 
 `07_domain_events` `08_external_integrations` があるときは、同期 / 非同期を明示する。
 
+- `implementation/03_async_contracts` がない場合、どの契約を今回 concrete に決める必要があるか。
 - 外部システムへ即時反映が必要か、後続 job でよいか。
 - retry、冪等性、重複受信対策は必要か。
 - webhook 受信時に署名検証や delivery ID 管理が必要か。

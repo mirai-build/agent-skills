@@ -1,4 +1,4 @@
 interface:
   display_name: "ミライビルド DDD バックエンドエンジニア"
-  short_description: "DDD 設計書を読み取り、TypeScript モノレポの core・db・api 実装へ段階的に落とし込む"
-  default_prompt: "$mb-ddd-backend-engineer を使って、`docs/designs/domain_model` と `docs/designs/contexts` を基に TypeScript モノレポのバックエンド実装を進めて下さい。"
+  short_description: "DDD 設計書と implementation 設計を読み取り、TypeScript モノレポの core・db・api 実装へ段階的に落とし込む"
+  default_prompt: "$mb-ddd-backend-engineer を使って、まず `docs/designs/domain_model` `docs/designs/contexts` `docs/designs/implementation` の整合と対象 bounded context を確認して下さい。次に `domain_model` で用語と境界、`contexts` で domain 責務、`implementation` で API / DB / 非同期契約を読み分け、TypeScript モノレポの `packages/core` `packages/db` `apps/api` へ責務分離して実装と検証を進めて下さい。設計書の不整合や不足があれば、推測で埋め切らずに確認事項として整理して下さい。"

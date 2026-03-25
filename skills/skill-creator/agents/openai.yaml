@@ -1,0 +1,6 @@
+interface:
+  display_name: "スキルクリエイター"
+  short_description: "Codex Skill の作成や更新を日本語前提で支援する"
+  icon_small: "./assets/skill-creator-small.svg"
+  icon_large: "./assets/skill-creator.png"
+  default_prompt: "$skill-creator を使って、再利用しやすい Codex Skill を日本語で作成または更新して下さい。"

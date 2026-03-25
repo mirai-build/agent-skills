@@ -1,6 +1,6 @@
 # Bounded Context 概要
 
-> 使い方: 1 つの bounded context ごとに最初に作成し、この context の責務と関連文書の入口にする。`06_interfaces` を除き、カテゴリ一覧へ項目を載せたら各カテゴリ配下の詳細ドキュメントも必ず作成する。`07_domain_events` と `08_external_integrations` は必要な場合だけ追加する。
+> 使い方: 1 つの bounded context ごとに最初に作成し、この context の責務と関連文書の入口にする。`06_interfaces` を除き、カテゴリ一覧へ項目を載せたら各カテゴリ配下の詳細ドキュメントも必ず作成する。`07_domain_events` と `08_external_integrations` は必要な場合だけ追加する。実装向け設計を別途作る場合は、その導線も関連文書へ追加する。
 
 ## 0. 文書の目的
 
@@ -11,6 +11,7 @@
 - Context 名:
 - 役割:
 - 上位ドキュメント:
+- 関連ユーザージャーニー:
 
 ## 1. この Context が扱うこと
 
@@ -34,6 +35,7 @@
 | `06_interfaces/00_overview.md` | Interface 一覧の入口 |
 | `07_domain_events/00_overview.md` | 必要な場合だけ追加する Domain Event 一覧の入口 |
 | `08_external_integrations/00_overview.md` | 必要な場合だけ追加する External Integration 一覧の入口 |
+| `../../implementation/NN_<bounded-context>/00_overview.md` | 必要な場合だけ追加する実装向け設計の入口 |
 
 ## 4. 未確定事項
 

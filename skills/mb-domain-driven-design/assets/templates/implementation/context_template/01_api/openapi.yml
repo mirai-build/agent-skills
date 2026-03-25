@@ -1,0 +1,59 @@
+openapi: 3.1.0
+info:
+  title: "[API 名]"
+  version: "0.1.0"
+  description: >
+    [この bounded context の API の目的を記入]
+tags:
+  - name: [tag-name]
+    description: [役割を記入]
+servers:
+  - url: https://api.example.com
+paths:
+  /[resource]:
+    get:
+      tags:
+        - [tag-name]
+      summary: [一覧取得などの要約]
+      operationId: [operationId]
+      parameters:
+        - name: [parameterName]
+          in: query
+          required: false
+          schema:
+            type: string
+          description: [説明]
+      responses:
+        "200":
+          description: [成功時の説明]
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/[ResponseSchema]"
+              examples:
+                default:
+                  value:
+                    [key]: [value]
+        "400":
+          description: [入力不正]
+        "401":
+          description: [認証エラー]
+        "403":
+          description: [認可エラー]
+        "404":
+          description: [未検出]
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    [ResponseSchema]:
+      type: object
+      properties:
+        [key]:
+          type: string
+          description: [説明]
+security:
+  - bearerAuth: []

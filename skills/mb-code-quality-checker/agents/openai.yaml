@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド コード品質チェッカー"
+  short_description: "言語別ルールで品質確認と修正を進め、初版は TypeScript を支援する"
+  default_prompt: "$mb-code-quality-checker を使って、対象リポジトリの言語ルールを選び、初版の TypeScript ルールで整形、lint、型検査、テストを確認し、失敗時は修正して通過状況を報告して下さい。"

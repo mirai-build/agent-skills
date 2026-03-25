@@ -1,0 +1,4 @@
+interface:
+  display_name: "MB ドメイン駆動設計"
+  short_description: "DDD に沿って情報を引き出し、bounded context ごとに設計書を整備する"
+  default_prompt: "$mb-domain-driven-design を使って、ユーザーへ必要情報を質問しながら `docs/designs/contexts` を含むドメイン駆動設計の設計書を Markdown で段階的に作成して下さい。"

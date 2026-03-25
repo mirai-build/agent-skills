@@ -1,6 +1,6 @@
 # ValueObjects 一覧
 
-> 使い方: この bounded context の ValueObject 一覧の入口として使う。詳細を追加したら、この一覧も更新する。
+> 使い方: この bounded context の ValueObject 一覧の入口として使う。一覧へ載せた ValueObject ごとに詳細ドキュメントを 1 つ作成し、追加や更新があればこの一覧も更新する。
 
 ## 0. 文書の目的
 

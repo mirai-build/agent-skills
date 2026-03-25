@@ -10,14 +10,15 @@
   - Codex Skill の作成と更新を支援する Skill です。
   - 明確な指示がない限り、Skill 本文や関連ドキュメントを日本語で作成する前提にカスタマイズしています。
 - `mb-git-clean-branches`
+  - 表示名は `ミライビルド gitブランチ掃除` です。
   - マージ済み Git ブランチの候補確認と安全な削除を支援する Skill です。
   - `skills/mb-git-clean-branches/` に同梱しています。
 - `mb-git-rebase`
-  - 表示名は `git rebase 支援` です。
+  - 表示名は `ミライビルド git rebase` です。
   - GitHub の PR 先判定と Bitbucket 向けの比較候補提示を使い、安全な rebase と競合解消を支援する Skill です。
   - `skills/mb-git-rebase/` に同梱しています。
 - `mb-domain-driven-design`
-  - 表示名は `MB ドメイン駆動設計` です。
+  - 表示名は `ミライビルド ドメイン駆動設計` です。
   - DDD に沿って不足情報を質問しながら、`docs/designs/` 配下の設計書を段階的に整備する Skill です。
   - `skills/mb-domain-driven-design/` に同梱しています。
 - `mb-ddd-backend-engineer`

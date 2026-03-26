@@ -69,12 +69,18 @@ packages/core/
       services/
         SomeApplicationService/
           SomeApplicationService.ts
+          helpers/
+          errors/
+          types/
           __tests__/
           index.ts
         shared/
       queries/
         SomeQueryService/
           SomeQueryService.ts
+          helpers/
+          errors/
+          types/
           __tests__/
           index.ts
         shared/
@@ -91,11 +97,17 @@ packages/core/
       repositories/
         SomeRepository/
           SomeRepository.ts
+          helpers/
+          errors/
+          types/
           index.ts
         shared/
       gateways/
         SomeGateway/
           SomeGateway.ts
+          helpers/
+          errors/
+          types/
           index.ts
         shared/
 
@@ -108,7 +120,9 @@ packages/db/
     repositories/
       SomePrismaRepository/
         SomePrismaRepository.ts
-        mappers.ts
+        mappers/
+        helpers/
+        errors/
         __tests__/
         index.ts
       shared/
@@ -134,11 +148,13 @@ apps/api/
 
 - `packages/core/src` の top-level は bounded context 単位にし、`packages/core/src/<bounded-context>/` 配下を `services` `queries` `domain` `repositories` `gateways` `shared` の責務単位にする。
 - `packages/core` の時点で downstream package が依存する抽象をそろえる。Repository を使う use case は、db 実装前に interface と利用側 Service まで用意する。
-- `services` `queries` `repositories` `gateways` は、ファイルを平置きせず `SomeApplicationService/` `SomeQueryService/` `SomeRepository/` のように責務ごとのディレクトリへ分ける。
-- `services` は write side の完了点を担う ApplicationService を置く。`src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts` を基本形にする。
-- `queries` は read side の DTO 組み立てを担う QueryService を置く。`src/<bounded-context>/queries/SomeQueryService/SomeQueryService.ts` を基本形にする。
+- `services` `queries` `repositories` `gateways` は、ファイルを平置きせず `SomeApplicationService/` `SomeQueryService/` `SomeRepository/` のように責務ごとのディレクトリへ分ける。各コンポーネント配下でも helper、error、type などの補助要素を直下へ平置きせず、`helpers/` `errors/` `types/` のような用途別サブディレクトリへ整理する。
+- 大きなファイルを避け、原則 1 ファイル 1 関数、1 ファイル 1 型、1 ファイル 1 責務で分離する。1 つのファイルへ多数の関数、型、補助処理を押し込まない。
+- Service / Repository の class は巨大化させず、各関数は原則 helper や mapper を呼ぶ薄い入口に保つ。複雑な分岐、検証、整形、クエリ組み立て、永続化変換は class 本体ではなく補助関数へ逃がす。
+- `services` は write side の完了点を担う ApplicationService を置く。`src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts` を基本形にし、補助要素は `helpers/` `errors/` `types/` のような用途別サブディレクトリへ分ける。
+- `queries` は read side の DTO 組み立てを担う QueryService を置く。`src/<bounded-context>/queries/SomeQueryService/SomeQueryService.ts` を基本形にし、補助要素は `helpers/` `errors/` `types/` のような用途別サブディレクトリへ分ける。
 - `domain` は Entity、ValueObject、Aggregate、Policy、DomainService の正本にし、`src/<bounded-context>/domain/` 配下で `aggregates/` `entities/` `value-objects/` `services/` の内側も責務ごとのディレクトリを切る。
-- `repositories` と `gateways` には interface だけを置き、`src/<bounded-context>/repositories/UserRepository/UserRepository.ts` のように interface 名とディレクトリ名を揃える。
+- `repositories` と `gateways` には interface だけを置き、`src/<bounded-context>/repositories/UserRepository/UserRepository.ts` のように interface 名とディレクトリ名を揃える。補助要素が必要なら `helpers/` `errors/` `types/` のような用途別サブディレクトリへ分ける。
 - Repository interface は `UserRepository` のように domain での責務名をそのまま表し、Prisma などの技術名を含めない。
 - `services/shared/` や `repositories/shared/` には、その layer 内で複数コンポーネントから共有するものだけを置く。特定 bounded context の domain 内だけで共有するものは `src/<bounded-context>/domain/shared/` に置き、layer をまたいで共有する契約だけを `src/<bounded-context>/shared/` に置く。
 - 特定コンポーネントに閉じない汎用関数は、最も狭い共有範囲の `shared/` へ置く。単純な日付変換や共通整形を `SomeApplicationService.ts` や `SomeQueryService.ts` に直書きしない。
@@ -149,7 +165,9 @@ apps/api/
 - `prisma/schema.prisma` は永続化モデルの正本にする。
 - `src/client` には PrismaClient provider や transaction 制御を置く。
 - `src/repositories/SomePrismaRepository/` に Repository ごとの Prisma 実装を置く。
-- Prisma 実装は `SomePrismaRepository` のように `packages/core` で先に定義した interface を `implements` する concrete class とし、`mappers.ts` `__tests__/` `index.ts` も同じディレクトリ配下へまとめる。
+- Prisma 実装は `SomePrismaRepository` のように `packages/core` で先に定義した interface を `implements` する concrete class とし、`mappers/` `helpers/` `errors/` `__tests__/` `index.ts` も同じディレクトリ配下へまとめる。helper、mapper、error などは `src/repositories/SomePrismaRepository/helpers/buildUserWhereInput.ts` のように用途別サブディレクトリへ分ける。
+- Repository 配下でも 1 ファイル 1 責務を崩さず、型、mapper、変換 helper、保存処理を巨大な 1 ファイルへ混在させない。補助要素を Repository 直下へ平置きせず、用途ごとのサブディレクトリへ整理する。
+- Repository class の各関数は helper / mapper の呼び出しと永続化依存の接続に集中させ、where 句の構築、record 変換、エラー解釈、保存前後の整形は helper / mapper へ切り出す。class 内へ private method を増やしてロジックを抱え込まない。
 - `packages/db` で domain rule や Repository interface を再定義せず、永続化詳細の吸収と core 抽象の実装に責務を限定する。
 - 複数 Repository 実装で共有する mapper や補助処理は `src/repositories/shared/` へ置く。
 - Repository の責務は単純なデータ IO、永続化都合の変換、transaction 単位の保存操作までに限定し、業務処理や業務判断は Service 側へ残す。
@@ -189,6 +207,8 @@ apps/api/
 1. `packages/core`
 - `src/<bounded-context>/` 配下を `services` `queries` `domain` `repositories` `gateways` `shared` に責務ごとに分ける。
 - `domain` はその bounded context の正本として扱い、その他の layer は `SomeApplicationService/SomeApplicationService.ts` のようにコンポーネント名ディレクトリを切り、`index.ts` と `__tests__/` を同居させる。
+- ApplicationService、QueryService、Repository interface、型、helper を 1 ファイルへ抱え込まず、原則 1 ファイル 1 責務になるよう分離する。
+- ApplicationService や QueryService の class 関数も、原則として helper を呼ぶ薄い入口に保ち、分岐、検証、整形、DTO 組み立ては `helpers/` へ切り出す。
 - Repository が必要な use case では、この段階で interface とそれを利用する Service の依存を確定し、db 実装が後から差し込める形にする。
 - 各コンポーネント配下の `index.ts` と `packages/core/src/index.ts` の公開面を更新する。
 - unit test は対象ディレクトリ近傍の `__tests__` に置き、fake repository で業務ルールを確認する。
@@ -218,15 +238,20 @@ apps/api/
 - `services/shared/` `queries/shared/` `repositories/shared/` は同じ bounded context 内の同 layer でだけ共有するものに絞り、`src/<bounded-context>/shared/` は layer 横断の共有に絞る。
 - `packages/core/src/shared` は「複数 context から同じ意味で使う契約」だけに絞る。
 - そのコンポーネントに閉じない汎用関数は、コンポーネント本体へ書かず最も狭い `shared/` に寄せる。
+- 1 ファイルに大量の関数や型を置かず、helper や型定義も独立した責務を持つなら別ファイルへ切り出す。
 - Service は constructor で repository / gateway interface を受け取る。
-- 先行 stub を置く場合も、なぜそのファイルが存在するかが分かる短いコメントを付ける。
+- core 側でも helper、error、type などの補助要素をコンポーネント直下へ並べず、用途別サブディレクトリへ分ける。
+- Service class 内に private method を増やして処理を抱え込まず、helper を呼ぶ薄い構成を優先する。
+- 先行 stub を置く場合も、なぜそのファイルが存在するかが分かる短い日本語コメントを付ける。
 
 ## `packages/db` 実装ルール
 
 - Prisma model は API DTO ではなく、永続化都合に基づいて設計する。
 - repository は Prisma record と aggregate の相互変換責務を持つ。
-- 1 つの Repository ディレクトリには、その Repository を実装する class、mapper、test、index だけを置き、別 Repository の処理を混在させない。
+- 1 つの Repository ディレクトリには、その Repository を実装する class、用途別に分けた mapper / helper / error、test、index だけを置き、別 Repository の処理を混在させない。
 - 複数 Repository で共有する mapper や helper は `src/repositories/shared/` に置く。
+- Repository 実装でも 1 ファイル 1 責務を守り、複数の保存処理、型定義、補助関数を単一ファイルへ詰め込まない。
+- Repository class も helper / mapper 呼び出しに寄せた薄い構成を優先し、private method を増やしてロジックを抱え込まない。
 - repository に業務ロジックを書かず、データ IO、永続化変換、整合性を保つ保存操作だけに責務を絞る。業務判断は ApplicationService や DomainService で扱う。
 - transaction をまたぐ複数保存は、ApplicationService の完了点と揃えて扱う。
 - repository error や data integrity error が既存 repo にあるなら、その規約を優先して合わせる。

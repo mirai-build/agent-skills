@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド DDD設計レビュワー"
+  short_description: "DDD 設計書を診断し、総評と良い点、修正指示を具体化する"
+  default_prompt: "$mb-ddd-architect-reviewer を使って、まず docs/design と docs/designs のどちらに設計書があるか確認し、DDD の戦略設計と戦術設計の観点で過不足をレビューして下さい。レビュー結果は `総評` `良い点` `指摘事項` を大見出しにし、修正方針が回答次第で変わる場合だけ `確認事項` を追加して下さい。`指摘事項` は `mb-ddd-architect` にそのまま渡せる修正指示として日本語で具体化し、`確認事項` がある場合は回答後に確定して下さい。"

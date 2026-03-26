@@ -18,14 +18,16 @@ license: Apache-2.0
 - `packages/core` は framework 非依存で Repository interface を持つ layer、`packages/db` はその interface を実装する Prisma / RDB の具体実装、`apps/api` は NestJS の runtime 入口として分離する。
 - 依存方向は必ず `packages/core -> packages/db -> apps/api` を守り、逆向きの import や責務逆流を許さない。特に Repository は先に core 側へ抽象 interface を定義し、その後で db 側に `implements` する具体実装を置く。
 - controller と `packages/db` の Prisma repository 実装に業務判断を持ち込まない。業務ルールはまず `packages/core` に置く。
-- ディレクトリは `src/` 配下で責務ごとに分け、layer 直下へファイルを平置きせずコンポーネント単位でディレクトリを切る。core 側は `packages/core/src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts` のように bounded context 配下へ寄せ、db 側は `packages/db/src/repositories/SomePrismaRepository/SomePrismaRepository.ts` のように置く構成を基本にする。
+- ディレクトリは `src/` 配下で責務ごとに分け、layer 直下へファイルを平置きせずコンポーネント単位でディレクトリを切る。core 側は `packages/core/src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts` を起点に `helpers/` `errors/` `types/` のような用途別サブディレクトリへ分け、db 側は `packages/db/src/repositories/SomePrismaRepository/SomePrismaRepository.ts` を起点に `helpers/` `mappers/` `errors/` のような用途別サブディレクトリへ分ける構成を基本にする。
+- 大きなファイルを避け、原則 1 ファイル 1 関数、1 ファイル 1 型、1 ファイル 1 責務で分離する。1 つのファイルへ多数の関数、型、補助処理を詰め込んで可読性と保守性を落とさない。
+- Repository や Service の class を巨大化させない。class の各関数は原則として helper の呼び出しと依存先のオーケストレーションに寄せ、複雑な分岐、検証、整形、クエリ組み立て、永続化変換は `helpers/` や `mappers/` へ逃がす。
 - 複数コンポーネントで共有するものは、その共有範囲に対応する `shared/` へ分ける。たとえば core 側で service 間で共有するものは `packages/core/src/<bounded-context>/services/shared/`、core 側で layer をまたぐものは `packages/core/src/<bounded-context>/shared/`、repository 間で共有するものは `packages/db/src/repositories/shared/` に置く。
 - そのコンポーネントに閉じない汎用的な関数は、コンポーネント本体へ直書きせず対応する `shared/` へ逃がす。単純な日付変換や共通整形のような処理を、個別 Service や Repository に抱え込まない。
 - `implementation/openapi.yml` `implementation/NN_<bounded-context>/02_database` `implementation/NN_<bounded-context>/03_async_contracts` がある場合は、それぞれ API、永続化、非同期契約の一次情報として扱う。ただし API は対象 bounded context の tag を起点に読み、`domain_model` や `contexts` の責務と矛盾していれば、そのまま実装せず先に不整合を解消する。
 - 設計書で曖昧な点がある場合は、識別子、一貫性境界、状態遷移、永続化形、API 入出力、外部連携を優先して 1〜3 個ずつ質問する。質問観点は `references/implementation_questions.md` を使う。
 - 実装順は原則 `core -> db -> api` とし、export と test まで同じターンで揃える。
 - 実装中に `domain_model` `contexts` `implementation` の前提ずれが見つかったら、コードだけで吸収せず、どの文書へ差分を返すべきかを整理して報告する。
-- 新規追加した関数、クラス、複雑な処理には、保守時に意図が追える短いコメントを付ける。
+- 新規追加した関数、クラス、複雑な処理には、保守時に意図が追える短い日本語コメントを付ける。
 
 ## 使う場面
 
@@ -57,6 +59,8 @@ license: Apache-2.0
 - db や api の実装に着手する前に、core 側で domain model、Service、Repository interface までを先に確定し、後続 layer が参照する抽象の入口をそろえる。
 - ApplicationService は `packages/core/src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts`、QueryService は `packages/core/src/<bounded-context>/queries/SomeQueryService/SomeQueryService.ts` のようにコンポーネント名とディレクトリ名を揃える。
 - Repository interface は `packages/core/src/<bounded-context>/repositories/UserRepository/UserRepository.ts` のように責務ごとのディレクトリへ置き、interface 名は `UserRepository` のように domain の責務が分かる名前にする。
+- Service、Repository interface、型、補助関数を 1 ファイルへまとめ書きせず、原則 1 ファイル 1 責務で分離する。関連型や helper も独立した責務を持つなら別ファイルへ切り出し、`packages/core/src/<bounded-context>/services/SomeApplicationService/helpers/validateInput.ts` や `errors/` `types/` のような用途別サブディレクトリへ整理する。
+- Service class の各関数は薄いオーケストレーションにとどめ、分岐、入力検証、整形、計算、DTO 組み立てのような処理は helper へ切り出す。class 内に private method を増やしてロジックを抱え込むより、`helpers/` 配下の独立した関数へ逃がすことを優先する。
 - 複数 Service や Repository で共有する contract / helper は、共有範囲に応じて `packages/core/src/<bounded-context>/services/shared/` や `packages/core/src/<bounded-context>/repositories/shared/`、layer 横断なら `packages/core/src/<bounded-context>/shared/` へ分ける。
 - 個別 Service に閉じない汎用関数は `services/shared/` や `shared/` へ寄せ、単純な日付変換や共通整形を特定コンポーネントへ閉じ込めない。
 - `implementation` にある API DTO や DB 名をそのまま domain へ持ち込まず、ユビキタス言語との差分は境界で吸収する。
@@ -69,7 +73,9 @@ license: Apache-2.0
 - `00_overview.md` の ER 図、各 table 詳細、`contexts` の Aggregate / Repository 設計を突き合わせ、保存単位と transaction 境界が崩れないようにする。
 - `packages/db/src/client` に PrismaClient provider があるか確認し、必要に応じて transaction 共有や env 解決を揃える。
 - `packages/db/src/repositories/SomePrismaRepository/` のように Repository 実装ごとにディレクトリを分け、必ず `packages/core` で先に定義した Repository interface を `implements` する Prisma 実装を置く。db 側で interface や domain ルールを再定義しない。
-- Prisma 実装の class 名は `SomePrismaRepository` のようにライブラリ依存であることが伝わる名前にし、`mappers.ts`、`__tests__/`、`index.ts` も同じ Repository ディレクトリ配下へ閉じ込める。
+- Prisma 実装の class 名は `SomePrismaRepository` のようにライブラリ依存であることが伝わる名前にし、`mappers/` `helpers/` `errors/` `__tests__/` `index.ts` も同じ Repository ディレクトリ配下へ閉じ込める。たとえば helper は `packages/db/src/repositories/SomePrismaRepository/helpers/buildUserWhereInput.ts` のように用途別ディレクトリで分ける。
+- Repository 配下でも 1 ファイルに複数の業務関数や型を抱え込まず、mapper、型、変換、保存処理を責務単位で分離する。helper、mapper、error などの補助要素を Repository 直下へ平置きせず、用途ごとのサブディレクトリへ整理する。`SomePrismaRepository.ts` を巨大な万能ファイルにしない。
+- Repository class の各関数も helper や mapper を呼ぶ薄い入口にとどめ、where 句の組み立て、record 変換、永続化前後の整形、エラー解釈は helper / mapper へ逃がす。Repository class 自体へ複雑な分岐や長い手続きを抱え込まない。
 - 複数 Prisma Repository で共有する変換や補助処理は `packages/db/src/repositories/shared/` に置き、個別 Repository ディレクトリへ重複配置しない。
 - Repository は単純なデータ IO と永続化差分の吸収に責務を限定し、業務処理や業務判断は書かない。業務ロジックの責務は Service 側で担保する。
 - DB 名やカラム名が domain 用語と異なる場合は、変換責務を repository に閉じ込める。
@@ -107,11 +113,15 @@ license: Apache-2.0
 
 - 実装は既存 repo の命名、package manager、script、lint rule を優先する。
 - TypeScript profile ではディレクトリ名と主役の class / interface 名を揃える PascalCase を基本にし、`packages/core/src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts` `packages/core/src/<bounded-context>/queries/SomeQueryService/SomeQueryService.ts` `packages/core/src/<bounded-context>/repositories/UserRepository/UserRepository.ts` `packages/db/src/repositories/SomePrismaRepository/SomePrismaRepository.ts` のように配置する。
+- 原則 1 ファイル 1 関数、1 ファイル 1 型、1 ファイル 1 責務で分離し、1 つのファイルへ多数の関数、型、補助処理を詰め込まない。
 - 依存方向は `packages/core -> packages/db -> apps/api` に固定し、Repository は `packages/core` で定義した抽象 interface を `packages/db` が `implements` する形から外れない。
+- `packages/core/src/<bounded-context>/<layer>/<Component>/` 配下でも helper、error、type などの補助要素を `helpers/` `errors/` `types/` のような用途別サブディレクトリへ分け、`packages/core/src/<bounded-context>/services/SomeApplicationService/helpers/validateInput.ts` のように整理する。
+- `packages/db/src/repositories/<Repository>/` 配下では helper、mapper、error などの補助要素を `helpers/` `mappers/` `errors/` のような用途別サブディレクトリへ分け、`packages/db/src/repositories/<Repository>/helpers/someHelperFunction.ts` のように整理する。
+- Service / Repository の class 関数は原則 helper や mapper の呼び出しへ寄せ、class 自体へ複雑な分岐、検証、整形、クエリ組み立て、永続化変換を抱え込まない。
 - layer 内で共有するものは必ずその layer の `shared/` に寄せ、複数コンポーネントから参照される helper や mapper を個別ディレクトリへ重複配置しない。
 - そのコンポーネントに閉じない汎用関数はコンポーネント本体ではなく `shared/` へ置き、単純な日付変換や共通整形を各コンポーネントへ重複させない。
 - Repository には業務処理を書かず、単純なデータ IO と永続化変換だけを持たせる。業務ロジックは Service 側で担保する。
-- 新規ファイルには、存在理由や複雑な判断が分かる短いコメントを必要箇所に入れる。
+- 新規ファイルには、存在理由や複雑な判断が分かる短い日本語コメントを必要箇所に入れる。
 - 未確定事項を仮置きで進めたときは、コードコメントか最終報告で仮説を明示する。
 - `implementation` がないまま API / DB / 非同期入口を大きく追加するときは、どこを既存コード規約から補い、どこが未確定かを明示する。
 - 設計書と実装がずれた場合は、ずれた箇所と理由を報告し、必要なら `skills/mb-ddd-architect` で設計書更新を提案する。

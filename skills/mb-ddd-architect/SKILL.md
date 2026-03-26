@@ -1,10 +1,10 @@
 ---
-name: mb-domain-driven-design
-description: ドメイン駆動設計に沿って、リポジトリ内の `docs/designs` の成熟度を見極めながら、`docs/designs/domain_model` `docs/designs/contexts` `docs/designs/implementation` を段階的に整備するスキル。設計がまだ薄いときは domain_model から始め、domain_model が揃ったら contexts を 1 件ずつ深め、domain_model と contexts が揃った bounded context に対して API や DB を含む実装向け設計へ進みたいときに使う。
+name: mb-ddd-architect
+description: DDD に沿って、リポジトリ内の `docs/designs` の成熟度を見極めながら、`docs/designs/domain_model` `docs/designs/contexts` `docs/designs/implementation` を段階的に整備するスキル。設計がまだ薄いときは domain_model から始め、domain_model が揃ったら contexts を 1 件ずつ深め、domain_model と contexts が揃った bounded context に対して API や DB を含む実装向け設計へ進みたいときに使う。
 license: Apache-2.0
 ---
 
-# MB ドメイン駆動設計
+# ミライビルド DDDアーキテクト
 
 ユーザーと並走しながら、DDD に準じた設計書を Markdown で整備する。
 推測だけで書き切らず、情報が不足している箇所は都度質問し、合意できた内容から `docs/designs/` 配下へ段階的に反映する。

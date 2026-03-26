@@ -11,6 +11,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = REPO_ROOT / "skills"
+RENAMED_SKILL_DIRECTORIES: dict[str, tuple[str, ...]] = {
+    "mb-ddd-architect": ("mb-domain-driven-design",),
+}
 
 
 class InstallError(RuntimeError):
@@ -83,6 +86,22 @@ def select_skills(requested_skills: list[str], install_all: bool) -> list[str]:
     return selected
 
 
+def remove_replaced_skill_directories(
+    skill_name: str,
+    target_root: Path,
+    dry_run: bool,
+) -> None:
+    """改名した Skill の旧ディレクトリが残らないように置換対象を片付ける。"""
+
+    for legacy_name in RENAMED_SKILL_DIRECTORIES.get(skill_name, ()):
+        legacy_dir = target_root / legacy_name
+        if not legacy_dir.exists():
+            continue
+
+        if not dry_run:
+            shutil.rmtree(legacy_dir)
+
+
 def install_skill(
     skill_name: str,
     target_root: Path,
@@ -105,6 +124,13 @@ def install_skill(
         if not dry_run:
             # 上書き時に古いファイルを残さないよう、対象 Skill ディレクトリだけを置き換える。
             shutil.rmtree(destination_dir)
+
+    # 改名した Skill は旧ディレクトリも同時に片付け、インストール先を 1 つにそろえる。
+    remove_replaced_skill_directories(
+        skill_name=skill_name,
+        target_root=target_root,
+        dry_run=dry_run,
+    )
 
     if not dry_run:
         target_root.mkdir(parents=True, exist_ok=True)

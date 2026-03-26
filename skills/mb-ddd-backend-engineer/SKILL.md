@@ -6,17 +6,21 @@ license: Apache-2.0
 
 # ミライビルド DDD バックエンドエンジニア
 
-`skills/mb-domain-driven-design` で整備した `domain_model` `contexts` `implementation` を出発点に、現在のリポジトリへバックエンド実装を追加または更新する。
+`skills/mb-ddd-architect` で整備した `domain_model` `contexts` `implementation` を出発点に、現在のリポジトリへバックエンド実装を追加または更新する。
 設計書をそのまま写経せず、`domain_model` で用語と bounded context 境界を確認し、`contexts` で domain の責務を確定し、`implementation` で API / DB / 非同期契約の具体形を確認したうえで、repo 既存ルールへ合わせて `core -> db -> api` の順で実装する。
 
 ## 実行原則
 
 - いきなり実装を始めない。最初に `docs/designs/domain_model` `docs/designs/contexts` `docs/designs/implementation`、既存コード、ディレクトリ構成、package manager、scripts を確認する。
 - まず対象 bounded context と今回の実装範囲を絞る。複数 context をまたぐときは依存順に小さく分ける。
-- 対象 bounded context の `implementation` が未整備なら、API / DB / 非同期契約を推測で埋め切らない。既存コード規約だけでは決め切れない点を質問するか、必要に応じて `skills/mb-domain-driven-design` で設計更新を提案する。
+- 対象 bounded context の `implementation` が未整備なら、API / DB / 非同期契約を推測で埋め切らない。既存コード規約だけでは決め切れない点を質問するか、必要に応じて `skills/mb-ddd-architect` で設計更新を提案する。
 - 実装 profile を決めてから動く。現在サポートしているのは TypeScript モノレポ構成だけで、`references/profiles/typescript-monorepo.md` を正本として扱う。
-- `packages/core` は framework 非依存、`packages/db` は Prisma / RDB の具体実装、`apps/api` は NestJS の runtime 入口として分離する。
-- controller と Prisma repository に業務判断を持ち込まない。業務ルールはまず `packages/core` に置く。
+- `packages/core` は framework 非依存で Repository interface を持つ layer、`packages/db` はその interface を実装する Prisma / RDB の具体実装、`apps/api` は NestJS の runtime 入口として分離する。
+- 依存方向は必ず `packages/core -> packages/db -> apps/api` を守り、逆向きの import や責務逆流を許さない。特に Repository は先に core 側へ抽象 interface を定義し、その後で db 側に `implements` する具体実装を置く。
+- controller と `packages/db` の Prisma repository 実装に業務判断を持ち込まない。業務ルールはまず `packages/core` に置く。
+- ディレクトリは `src/` 配下で責務ごとに分け、layer 直下へファイルを平置きせずコンポーネント単位でディレクトリを切る。core 側は `packages/core/src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts` のように bounded context 配下へ寄せ、db 側は `packages/db/src/repositories/SomePrismaRepository/SomePrismaRepository.ts` のように置く構成を基本にする。
+- 複数コンポーネントで共有するものは、その共有範囲に対応する `shared/` へ分ける。たとえば core 側で service 間で共有するものは `packages/core/src/<bounded-context>/services/shared/`、core 側で layer をまたぐものは `packages/core/src/<bounded-context>/shared/`、repository 間で共有するものは `packages/db/src/repositories/shared/` に置く。
+- そのコンポーネントに閉じない汎用的な関数は、コンポーネント本体へ直書きせず対応する `shared/` へ逃がす。単純な日付変換や共通整形のような処理を、個別 Service や Repository に抱え込まない。
 - `implementation/openapi.yml` `implementation/NN_<bounded-context>/02_database` `implementation/NN_<bounded-context>/03_async_contracts` がある場合は、それぞれ API、永続化、非同期契約の一次情報として扱う。ただし API は対象 bounded context の tag を起点に読み、`domain_model` や `contexts` の責務と矛盾していれば、そのまま実装せず先に不整合を解消する。
 - 設計書で曖昧な点がある場合は、識別子、一貫性境界、状態遷移、永続化形、API 入出力、外部連携を優先して 1〜3 個ずつ質問する。質問観点は `references/implementation_questions.md` を使う。
 - 実装順は原則 `core -> db -> api` とし、export と test まで同じターンで揃える。
@@ -48,8 +52,13 @@ license: Apache-2.0
 - 設計書の不整合や欠落がある場合は、どの論点を質問で埋めるか、どこまでを仮置きで進めるかを先に決める。
 
 2. core 実装
-- `packages/core/src/<bounded-context>/` 配下に `application` `query` `domain` `repositories` `gateways` を必要なものだけ追加する。
+- `packages/core/src/<bounded-context>/` 配下を `services` `queries` `domain` `repositories` `gateways` `shared` に整理し、さらに各 layer の中を責務ごとのディレクトリに分ける。
 - `contexts` を正本に、ValueObject、Entity、Aggregate、DomainService、Repository interface、ApplicationService、QueryService をコードへ落とす。
+- db や api の実装に着手する前に、core 側で domain model、Service、Repository interface までを先に確定し、後続 layer が参照する抽象の入口をそろえる。
+- ApplicationService は `packages/core/src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts`、QueryService は `packages/core/src/<bounded-context>/queries/SomeQueryService/SomeQueryService.ts` のようにコンポーネント名とディレクトリ名を揃える。
+- Repository interface は `packages/core/src/<bounded-context>/repositories/UserRepository/UserRepository.ts` のように責務ごとのディレクトリへ置き、interface 名は `UserRepository` のように domain の責務が分かる名前にする。
+- 複数 Service や Repository で共有する contract / helper は、共有範囲に応じて `packages/core/src/<bounded-context>/services/shared/` や `packages/core/src/<bounded-context>/repositories/shared/`、layer 横断なら `packages/core/src/<bounded-context>/shared/` へ分ける。
+- 個別 Service に閉じない汎用関数は `services/shared/` や `shared/` へ寄せ、単純な日付変換や共通整形を特定コンポーネントへ閉じ込めない。
 - `implementation` にある API DTO や DB 名をそのまま domain へ持ち込まず、ユビキタス言語との差分は境界で吸収する。
 - `07_domain_events` `08_external_integrations` や `03_async_contracts` がある場合は、core 側では発火点、event contract、gateway interface のどれを持つべきかを切り分ける。
 - `index.ts` を更新し、利用側の公開面を揃える。
@@ -59,9 +68,12 @@ license: Apache-2.0
 - `implementation/NN_<bounded-context>/02_database` を正本として `packages/db/prisma/schema.prisma` に永続化モデルを反映し、必要なら migration / generate の更新方針を確認する。
 - `00_overview.md` の ER 図、各 table 詳細、`contexts` の Aggregate / Repository 設計を突き合わせ、保存単位と transaction 境界が崩れないようにする。
 - `packages/db/src/client` に PrismaClient provider があるか確認し、必要に応じて transaction 共有や env 解決を揃える。
-- `packages/db/src/persistence/<context-or-aggregate>/` に Prisma repository を実装し、`packages/core` の Repository interface を満たす。
+- `packages/db/src/repositories/SomePrismaRepository/` のように Repository 実装ごとにディレクトリを分け、必ず `packages/core` で先に定義した Repository interface を `implements` する Prisma 実装を置く。db 側で interface や domain ルールを再定義しない。
+- Prisma 実装の class 名は `SomePrismaRepository` のようにライブラリ依存であることが伝わる名前にし、`mappers.ts`、`__tests__/`、`index.ts` も同じ Repository ディレクトリ配下へ閉じ込める。
+- 複数 Prisma Repository で共有する変換や補助処理は `packages/db/src/repositories/shared/` に置き、個別 Repository ディレクトリへ重複配置しない。
+- Repository は単純なデータ IO と永続化差分の吸収に責務を限定し、業務処理や業務判断は書かない。業務ロジックの責務は Service 側で担保する。
 - DB 名やカラム名が domain 用語と異なる場合は、変換責務を repository に閉じ込める。
-- repository test は永続化実装の近くに置き、`src/index.ts` `src/persistence/index.ts` の公開面も更新する。
+- repository test は永続化実装の近くに置き、`packages/db/src/repositories/index.ts` と package の公開面を更新する。
 
 4. api 実装
 - `apps/api/src/modules/<module-name>/` 配下に NestJS module と `presentation/http` `presentation/webhook` `presentation/batch` `presentation/worker` を必要な分だけ追加する。
@@ -94,11 +106,15 @@ license: Apache-2.0
 ## 出力ルール
 
 - 実装は既存 repo の命名、package manager、script、lint rule を優先する。
-- TypeScript profile では `*.app-service.ts` `*.query-service.ts` `*.repository.ts` `*.gateway.ts` `*.aggregate.ts` `*.entity.ts` `*.vo.ts` `*.service.ts` を基本 naming とする。
+- TypeScript profile ではディレクトリ名と主役の class / interface 名を揃える PascalCase を基本にし、`packages/core/src/<bounded-context>/services/SomeApplicationService/SomeApplicationService.ts` `packages/core/src/<bounded-context>/queries/SomeQueryService/SomeQueryService.ts` `packages/core/src/<bounded-context>/repositories/UserRepository/UserRepository.ts` `packages/db/src/repositories/SomePrismaRepository/SomePrismaRepository.ts` のように配置する。
+- 依存方向は `packages/core -> packages/db -> apps/api` に固定し、Repository は `packages/core` で定義した抽象 interface を `packages/db` が `implements` する形から外れない。
+- layer 内で共有するものは必ずその layer の `shared/` に寄せ、複数コンポーネントから参照される helper や mapper を個別ディレクトリへ重複配置しない。
+- そのコンポーネントに閉じない汎用関数はコンポーネント本体ではなく `shared/` へ置き、単純な日付変換や共通整形を各コンポーネントへ重複させない。
+- Repository には業務処理を書かず、単純なデータ IO と永続化変換だけを持たせる。業務ロジックは Service 側で担保する。
 - 新規ファイルには、存在理由や複雑な判断が分かる短いコメントを必要箇所に入れる。
 - 未確定事項を仮置きで進めたときは、コードコメントか最終報告で仮説を明示する。
 - `implementation` がないまま API / DB / 非同期入口を大きく追加するときは、どこを既存コード規約から補い、どこが未確定かを明示する。
-- 設計書と実装がずれた場合は、ずれた箇所と理由を報告し、必要なら `skills/mb-domain-driven-design` で設計書更新を提案する。
+- 設計書と実装がずれた場合は、ずれた箇所と理由を報告し、必要なら `skills/mb-ddd-architect` で設計書更新を提案する。
 
 ## リソース
 

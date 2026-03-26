@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド DDDアーキテクト"
+  short_description: "DDD に沿って docs の成熟度を見極め、domain_model から contexts、API / DB 設計へ段階的に整備する"
+  default_prompt: "$mb-ddd-architect を使って、まずリポジトリ内の `docs/designs` の成熟度を確認し、次に進めるべき 1 ステップだけを選んで下さい。設計が薄ければ `docs/designs/domain_model` を `01_system_purpose` `02_actors` `03_usecases` `04_journeys` `05_bounded_contexts` の順で整備し、`domain_model` が揃っていれば `docs/designs/contexts` を 1 bounded context ずつ整備し、対象 bounded context の `domain_model` と `contexts` が揃っていれば `docs/designs/implementation` で API / DB 設計へ進んで下さい。なお、上流ドキュメントを更新した場合は、影響を受ける下流ドキュメントへ必ず差分を波及させて下さい。"

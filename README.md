@@ -49,7 +49,12 @@
 
 ## インストール方法
 
-### 1. ローカル home へインストールする
+### 1. Codex App で全部インストールする
+
+Codex App でこのリポジトリを開いて、チャットで `全部インストールして` と依頼すれば完了です。
+Codex が `scripts/install_skills.py --mode home --all` を実行し、home 配下へまとめてインストールします。
+
+### 2. ローカル home へインストールする
 
 Codex App に自動検出させたい場合は、home 配下へインストールします。
 インストール先は `$CODEX_HOME/skills`、`CODEX_HOME` が未設定のときは `~/.codex/skills` です。
@@ -66,7 +71,7 @@ python3 scripts/install_skills.py --mode home --all
 
 home へインストールしたあとは、Codex App を再起動して Skill を読み込んで下さい。
 
-### 2. 他リポジトリへインストールする
+### 3. 他リポジトリへインストールする
 
 他リポジトリの `skills/` 配下へコピーして、リポジトリと一緒に管理したい場合はこちらを使います。
 
@@ -83,7 +88,7 @@ python3 scripts/install_skills.py --mode repo --repo-path /path/to/target-repo -
 repo へのインストールは、共有やバージョン管理を目的とした運用向けです。
 Codex App の自動検出は通常 home へのインストールが前提なので、repo へ配置した Skill は対象リポジトリ側の運用に応じて明示参照して下さい。
 
-### 3. インストール対象を一覧表示する
+### 4. インストール対象を一覧表示する
 
 ```bash
 python3 scripts/install_skills.py --list

@@ -16,14 +16,15 @@ license: Apache-2.0
 - `02_actors` と `03_usecases` は補助参照とし、画面の目的、主 actor、完了条件、遷移理由を補うために使う。
 - `ux/01_experience_scope` と `02_user_journeys` は正本を持たず、`domain_model` へのリンクだけを置く。本文を重複して書かない。
 - 1 回の作業で 1 つの段階だけ進める。`03_basic_layouts` `04_screen_inventory` `05_navigation_map` `06_screen_details` を同時に広げすぎない。
-- `03_basic_layouts` では、プロダクト全体のナビゲーション方針、画面の大分類、レイアウトの基本型、共通 UI 領域を定義する。見た目のワイヤーまではここで決めない。
+- `03_basic_layouts` では、プロダクト全体のナビゲーション方針、画面の大分類、レイアウトの基本型、利用端末ごとのレスポンシブ方針、共通 UI 領域を定義する。見た目のワイヤーまではここで決めない。
 - `03_basic_layouts` の共通 UI 領域は、存在するものだけを書く。存在しないものを機械的に列挙しない。本来あるべきところを意図的に外している場合だけ、その不採用を理由付きで書く。
 - 基本構成は 1 つに固定しない。複数の基本構成パターンが必要なら、`03_basic_layouts/01_*.md` を複数作成して管理する。
 - `04_screen_inventory` は overview を正本とし、画面一覧、簡単な説明、ユーザージャーニーとの対応を表形式で管理する。
 - 主要状態は既定で `通常` `空状態` `入力・業務エラー` `権限不足` を扱う。読み込み、確認モーダル、部分エラーなどは必要なときだけ追加する。
 - 画面遷移図は `05_navigation_map` で 1 ジャーニー 1 ファイルを基本とし、`04_screen_inventory` で定義した画面同士の接続関係を Mermaid と表で整理する。
 - 各画面詳細は `06_screen_details` で 1 画面 1 ファイルを正本とし、画面遷移の責務は持たせない。`入口と出口` のような遷移定義は書かない。
-- 各画面詳細では、どの基本構成を参照する画面かを必ず明示する。
+- 同じ画面を複数ジャーニーで使う場合も、画面詳細は 1 ファイルのままにし、ジャーニー別の利用文脈と完了条件を分けて整理する。
+- 各画面詳細では、どの基本構成を参照する画面かに加え、主要な画面内 UI と UI ごとの責務、必要な端末差分を明示する。
 - 詳細ドキュメントを追加または更新したら、対応する `00_overview.md` の一覧も同時に更新する。
 - 確定事項、仮置き、未確定事項を区別して記載する。仮置きで進める場合は、どこが仮説かを明示する。
 - 用語が `domain_model` と衝突する場合は、勝手に新語を作らず、どちらを正とするか確認してから反映する。
@@ -82,7 +83,7 @@ license: Apache-2.0
 
 - `06_screen_details/00_overview.md` を作成または更新し、どの画面の詳細が定義済みかを一覧化する。
 - 対象は 1 回の作業で 1 画面に絞る。
-- `06_screen_details/01_*.md` では、画面の役割、表示責務と操作責務、主要状態、関連文書を整理する。
+- `06_screen_details/01_*.md` では、画面の役割、利用文脈、画面内 UI、表示責務と操作責務、主要状態、関連文書を整理する。
 - 画面遷移の入口と出口は `05_navigation_map` の責務として扱い、画面詳細へ重複して書き込まない。
 
 ## 基本フロー
@@ -94,7 +95,7 @@ license: Apache-2.0
 2. 画面一覧の整理
 - [`assets/templates/00_overview.md`](./assets/templates/00_overview.md) をもとに `ux/00_overview.md` を作成または更新する。
 - [`assets/templates/01_experience_scope/00_overview.md`](./assets/templates/01_experience_scope/00_overview.md) と [`assets/templates/02_user_journeys/00_overview.md`](./assets/templates/02_user_journeys/00_overview.md) をもとに、`domain_model` へのリンク入口を整える。
-- [`assets/templates/03_basic_layouts/00_overview.md`](./assets/templates/03_basic_layouts/00_overview.md) と [`assets/templates/03_basic_layouts/01_basic_layout.md`](./assets/templates/03_basic_layouts/01_basic_layout.md) を使い、画面基本構成をパターン単位で整理する。
+- [`assets/templates/03_basic_layouts/00_overview.md`](./assets/templates/03_basic_layouts/00_overview.md) と [`assets/templates/03_basic_layouts/01_basic_layout.md`](./assets/templates/03_basic_layouts/01_basic_layout.md) を使い、画面基本構成と利用端末ごとのレスポンシブ方針をパターン単位で整理する。
 - [`assets/templates/04_screen_inventory/00_overview.md`](./assets/templates/04_screen_inventory/00_overview.md) を使い、必要画面の一覧を整理する。
 
 3. 画面遷移の整理
@@ -102,8 +103,8 @@ license: Apache-2.0
 - `04_screen_inventory` で定義した画面同士の接続関係を、どの条件でどこへ進むかまで明示する。
 
 4. 各画面詳細の整理
-- [`assets/templates/06_screen_details/00_overview.md`](./assets/templates/06_screen_details/00_overview.md) と [`assets/templates/06_screen_details/01_screen_detail.md`](./assets/templates/06_screen_details/01_screen_detail.md) を使い、画面ごとの責務を整理する。
-- 各画面詳細では、参照する基本構成、画面の役割、表示責務と操作責務、主要状態を明示する。
+- [`assets/templates/06_screen_details/00_overview.md`](./assets/templates/06_screen_details/00_overview.md) と [`assets/templates/06_screen_details/01_screen_detail.md`](./assets/templates/06_screen_details/01_screen_detail.md) を使い、画面ごとの責務、利用文脈、画面内 UI を整理する。
+- 各画面詳細では、参照する基本構成、画面の役割、ジャーニー別の利用文脈と完了条件、画面内 UI ごとの責務、主要状態を明示する。
 
 5. 仕上げ
 - [`references/consistency_checklist.md`](./references/consistency_checklist.md) を使って整合性を確認する。
@@ -113,10 +114,10 @@ license: Apache-2.0
 
 - 1 回の質問は 1〜3 テーマに絞り、今の段階に必要なものだけを聞く。
 - 抽象的な質問だけを投げず、候補やたたき台を添えて答えやすくする。
-- `basic_layouts` では「グローバルナビの単位」「ローカルナビの有無」「ロール差分の扱い方」「画面の大分類」「レイアウトの基本型」「共通 UI 領域」を優先して聞く。
+- `basic_layouts` では「グローバルナビの単位」「ローカルナビの有無」「ロール差分の扱い方」「画面の大分類」「レイアウトの基本型」「利用端末ごとの表示差分」「共通 UI 領域」を優先して聞く。
 - `screen_inventory` では「どのジャーニーに、どの画面が必要か」「その画面は何を一言で説明できるか」を優先して聞く。
 - `navigation_map` では「どの画面からどの画面へ進むか」「どんな条件で次へ進むか」「途中で戻る / 失敗する / 離脱するのはどこか」を優先して聞く。
-- `screen_details` では「この画面で必ず見せる情報」「この画面で主に判断・操作すること」「どの基本構成を参照する画面か」を優先して聞く。
+- `screen_details` では「この画面で必ず見せる情報」「この画面で主に判断・操作すること」「共有画面ならジャーニー別の利用文脈と完了条件」「主要な画面内 UI」「どの基本構成を参照する画面か」を優先して聞く。
 - ユーザーが答えづらいときは、仮説案を 1 つ提示し、「この理解で近いですか」と確認する。
 
 ## 出力ルール
@@ -124,13 +125,16 @@ license: Apache-2.0
 - Markdown で作成する。
 - `ux/01_experience_scope/00_overview.md` には、`domain_model/01_system_purpose` `02_actors` へのリンクだけを置く。内容を重複して書かない。
 - `ux/02_user_journeys/00_overview.md` には、`domain_model/04_journeys` へのリンクだけを置く。必要に応じて `03_usecases` を補助参照として案内する。
-- `03_basic_layouts` では、プロダクト全体のナビゲーション方針、画面の大分類、レイアウトの基本型、共通 UI 領域を整理する。
+- `03_basic_layouts` では、プロダクト全体のナビゲーション方針、画面の大分類、レイアウトの基本型、利用端末ごとのレスポンシブ方針、共通 UI 領域を整理する。
 - `03_basic_layouts` の共通 UI 領域は、存在するものだけを書く。存在しないものは原則書かず、本来あるべきところを意図的に外している場合だけ理由付きで書く。
 - `04_screen_inventory` は overview を正本とし、画面一覧、簡単な説明、ユーザージャーニーとの対応を表形式で置く。
+- 同じ画面を複数ジャーニーで共有する場合も、`04_screen_inventory` では画面を複製せず 1 行で管理し、対応ジャーニーへ複数記載する。
 - `05_navigation_map` では、Mermaid の遷移図と、遷移条件の表を必ずセットで置く。
 - `06_screen_details` の詳細タイトルは画面の実名にする。`Screen` や `画面テンプレート` のまま残さない。
-- `06_screen_details` では、各画面について参照する基本構成、目的、主 actor、対応ジャーニー、開始条件、完了条件、主要状態、関連 context を必ず追えるようにする。
+- `06_screen_details` では、各画面について参照する基本構成、目的、主 actor、対応ジャーニー、代表的な開始条件と完了条件、ジャーニー別の利用文脈、画面内 UI、主要状態、関連 context を必ず追えるようにする。
 - `06_screen_details` には `入口と出口` の節を置かない。遷移定義は `05_navigation_map` で管理する。
+- `06_screen_details` の個別 UI は、ボタンやラベル単位ではなく、利用者が意味のまとまりとして認識する単位で整理する。
+- 詳細テンプレートでは、確定事項、仮置き、未確定事項を区別して残す。
 - 画面名、状態名、ジャーニー名は、既存の `domain_model` と呼び名をそろえる。
 - 文書を追加または更新したら、関連する `00_overview.md` と相互リンクも更新し、不整合を残さない。
 

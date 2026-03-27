@@ -16,7 +16,7 @@ ALLOWED_RESOURCES = {"scripts", "references", "assets"}
 
 SKILL_TEMPLATE = """---
 name: {skill_name}
-description: [TODO: この Skill が何をするのか、どんな依頼で使うのかを日本語で具体的に記載する]
+description: [TODO: Skill 一覧で発見されやすいよう、何をする Skill かを平文の日本語で書く。冒頭を他 Skill 名、パス、コマンド、Markdown 記法から始めない]
 ---
 
 # [TODO: 日本語の表示名を記載する]
@@ -196,7 +196,7 @@ def init_skill(
 
     print(f"\n[OK] Skill '{skill_name}' を初期化しました: {skill_dir}")
     print("\n次の作業:")
-    print("1. SKILL.md の TODO を日本語で埋める")
+    print("1. SKILL.md の TODO を日本語で埋め、frontmatter description は一覧発見向けの平文へ整える")
     if resources:
         if include_examples:
             print("2. サンプルファイルを実装に置き換えるか、不要なら削除する")

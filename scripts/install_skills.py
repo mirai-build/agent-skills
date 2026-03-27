@@ -4,13 +4,16 @@
 from __future__ import annotations
 
 import argparse
-import os
 import shutil
 import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = REPO_ROOT / "skills"
+# 現行の Codex は user / repo ともに `.agents/skills` を探索する。
+# 旧来の `.codex/skills` や `repo/skills` は互換運用の名残として残りうるが、
+# 新規インストール先の正本はこの定数でそろえる。
+USER_SKILLS_DIR = Path.home() / ".agents" / "skills"
 RENAMED_SKILL_DIRECTORIES: dict[str, tuple[str, ...]] = {
     "mb-ddd-architect": ("mb-domain-driven-design",),
 }
@@ -36,10 +39,7 @@ def list_available_skills() -> list[str]:
 def resolve_home_directory() -> Path:
     """Codex が自動検出する標準の Skill 配置先を返す。"""
 
-    codex_home = os.environ.get("CODEX_HOME")
-    if codex_home:
-        return Path(codex_home).expanduser().resolve() / "skills"
-    return (Path.home() / ".codex" / "skills").resolve()
+    return USER_SKILLS_DIR.resolve()
 
 
 def resolve_target_directory(mode: str, repo_path: str | None) -> Path:
@@ -55,7 +55,7 @@ def resolve_target_directory(mode: str, repo_path: str | None) -> Path:
     if not target_repo.exists() or not target_repo.is_dir():
         raise InstallError(f"対象リポジトリのディレクトリが見つかりません: {target_repo}")
 
-    return target_repo / "skills"
+    return target_repo / ".agents" / "skills"
 
 
 def select_skills(requested_skills: list[str], install_all: bool) -> list[str]:
@@ -153,7 +153,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--mode",
         choices=["home", "repo"],
         default="home",
-        help="インストール先の種別。home は ~/.codex/skills または $CODEX_HOME/skills、repo は対象リポジトリ配下の skills/ です。",
+        help="インストール先の種別。home は ~/.agents/skills、repo は対象リポジトリ配下の .agents/skills です。",
     )
     parser.add_argument(
         "--repo-path",

@@ -13,7 +13,7 @@
 ## 1. 画面遷移図
 
 ```mermaid
-flowchart LR
+flowchart
   Start["開始"]
   ScreenA["画面A"]
   ScreenB["画面B"]

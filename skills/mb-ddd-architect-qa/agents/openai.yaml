@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド DDD設計Q&A"
+  short_description: "DDD 設計書を先に棚卸しし、設計・サービス・DB の質問へ根拠つきで答える"
+  default_prompt: "$mb-ddd-architect-qa を使って、`docs/designs/00_overview.md` から既定パスで必要文書へ直行し、広い一覧取得や grep を避けて下さい。回答は日本語で `結論` `根拠` `不足または確認事項` の順にまとめて下さい。"

@@ -1,4 +1,0 @@
-interface:
-  display_name: "ミライビルド UXプロトタイパー"
-  short_description: "UX設計を Build Web Apps 活用で画面プロトタイプへ実装する"
-  default_prompt: "$mb-ux-prototyper を使って、まず `ux/` `docs/designs/domain_model` `ux/prototype` と既存フロントエンド構成を確認し、UX 設計に基づく画面プロトタイプを TanStack Start + Tailwind CSS v4 + Radix + shadcn を基盤に実装して下さい。`Build Web Apps` plugin が使える環境では `build-web-apps:frontend-skill` `build-web-apps:react-best-practices` `build-web-apps:shadcn` を優先的に併用し、必要に応じて `build-web-apps:web-design-guidelines` と `build-web-apps:deploy-to-vercel` も使って下さい。API や外部通信は使わず、shadcn は必要最小限に留め、`pnpm dev` では画面遷移、Storybook では画面単位の状態差分を確認できるようにし、外部画面は簡易モックで受けて下さい。"

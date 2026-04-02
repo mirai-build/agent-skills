@@ -1,4 +1,0 @@
-interface:
-  display_name: "ミライビルド UXデザイナー"
-  short_description: "ユーザージャーニー起点で画面構成 docs を段階的に整理する"
-  default_prompt: "$mb-ux-designer を使って、まず既存の `docs/designs/domain_model/01_system_purpose` `02_actors` `03_usecases` `04_journeys` を確認して下さい。`01_system_purpose` または `04_journeys` が不足していれば、不足点を示したうえで `mb-ddd-architect` へ委譲し、前提が揃っていればプロジェクトルートの `ux/` を `03_basic_layouts` `04_screen_inventory` `05_navigation_map` `06_screen_details` の順で見て、次の 1 段階だけを進めて下さい。"

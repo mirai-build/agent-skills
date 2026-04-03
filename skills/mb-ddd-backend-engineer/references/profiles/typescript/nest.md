@@ -48,6 +48,8 @@ api/
         guards/
         interceptors/
       observability/
+  tests/
+    http-integration/
 ```
 
 ## 構成の意図
@@ -74,19 +76,27 @@ api/
 - `shared/nest/guards`: 認証認可の入口判定を置く。
 - `shared/nest/interceptors`: access log、tracing、latency 計測を置く。
 - `__tests__/`: 対象コンポーネントに最も近い unit test を置く。
+- `tests/http-integration`: `@nestjs/testing` と `supertest` を使う DB 接続付き API 結合テストを置く。既存 repo の harness があればそれを優先する。
+
+## TypeScript ファイル名
+
+- NestJS 配下の TypeScript ファイル名でも snake-case は使わない。
+- controller、DTO、Presenter、Builder、Mapper、validator など主語を表すファイルは PascalCase を使い、`AuthenticationController.ts` `CreateUser.dto.ts` `UserListPresenter.ts` のように命名する。
+- 関数中心の helper や builder helper は lowerCamelCase を使い、`buildUserResponse.ts` `someFunction.ts` のように命名する。
+- `.test.ts` `.dto.ts` `.models.ts` などの suffix を付ける場合も、主語部分は CamelCase 系を保つ。
 
 ## 実装パターン
 
 - `Module`: context ごとに module を切り、custom provider で `packages/core` の use case と `packages/db` の repository 実装を配線する。module は DI の composition root として扱う。
 - `Controller`: 薄く保ち、request DTO を受け、認証済み user や request metadata を取得し、`packages/core` の use case を呼ぶ。戻り値型は必ず response DTO で明示し、response の生成は Presenter / Builder へ委譲する。controller でその場の object literal を組み立てない。業務ルールや DB 操作は書かない。
-- `DTO / Validation`: DTO は HTTP 入力 / 出力表現として扱い、domain model と兼用しない。入力検証は DTO class と `ValidationPipe` を基本にする。
+- `DTO / Validation`: DTO は HTTP 入力 / 出力表現として扱い、domain model と兼用しない。入力検証は DTO class と `ValidationPipe` を基本にする。request / response DTO は transport 境界を表すために必要なものだけ定義し、既存 DTO や `packages/core` の result 型で十分な場面では同義の alias や wrapper 型を増やさない。
 
 ### Mapper / Presenter / Builder の使い分け
 
 - `Mapper`: 単純な項目変換だけを担当する。例として `toDto(domainObject): ResponseItemDto` のような形にする。
 - `Presenter`: response 表現を作る責務が中心のときに使う。collection、meta、link、request 由来の表現調整などをまとめ、必要に応じて複数の Mapper を組み合わせる。
-- `Builder`: 最終 DTO を組み立てる責務が中心のときに使う。`BuildXxxDtoInput` のような入力型を定義し、`build(input): XxxDto` の形で返す。
-- 引数が 3 つ以上に増える、または意味のまとまりを明示したいときは、Presenter でも `PresentXxxInput` のような入力型を定義してよい。
+- `Builder`: 最終 DTO を組み立てる責務が中心のときに使う。`BuildXxxDtoInput` のような入力型を定義し、`build(input): XxxDto` の形で返す。既存の DTO や `packages/core` の result 型で入力意図を表せるなら流用し、単なる引数束ねだけの 1 回限りの型は増やさない。
+- 引数が 3 つ以上に増える、または意味のまとまりを明示したいときは、Presenter でも `PresentXxxInput` のような入力型を定義してよい。ただし既存型で十分な場合は新設しない。
 - response 生成責務に `Pipe` という名前を使わない。`ValidationPipe` は request 検証の組み込み機能としてだけ扱う。
 
 ### 命名の目安
@@ -164,6 +174,7 @@ export class AuditLogPresenter {
 - `Filter`: `packages/core` の error を HTTP エラーへ変換する。
 - `Interceptor`: access log、tracing、latency 計測を扱う。
 - `Unit Test`: 対象コンポーネントのディレクトリ直下にある `__tests__/` へ置き、controller、validator、Mapper、Presenter、Builder、guard、interceptor、filter、module の近くで責務単位に確認する。
+- `結合テスト`: `packages/core` `packages/db` `apps/api` の必要な component を実装し切ってから、`@nestjs/testing` と `supertest` で app を起動し、HTTP 入口から DB まで接続して確認する。詳細は `references/api_integration_testing.md` を正本にする。
 
 ## `apps/api` 実装ルール
 
@@ -173,11 +184,14 @@ export class AuditLogPresenter {
 - `presentation/http` 配下には controller を薄いファイルとして置き、DTO、必要な Mapper / Presenter / Builder / validator を API 境界に閉じ込める。補助要素が少ない間は controller ごとのディレクトリを無理に増やさない。
 - request DTO は `class-validator` と `ValidationPipe` を基本に扱い、DTO を domain model と兼用しない。
 - response は基本的に DTO で返し、controller の戻り値型で明示する。response DTO の生成は Presenter / Builder を通して行う。
+- DTO や Builder / Presenter の入力型は transport 契約を表すために必要なものだけ追加し、既存 DTO や `packages/core` の result 型で十分なら流用する。
 - webhook / batch / worker が不要なら空ディレクトリを作らない。
 - module をまたいで共有する decorator / guard / interceptor は `src/shared/nest/`、observability は `src/shared/observability/` に置く。`packages/core` の error を HTTP エラーへ変換する filter は `src/bootstrap/filters/` へ寄せる。
 - `apps/api` の unit test も対象コンポーネントに最も近いディレクトリ直下の `__tests__/` に必ず置き、別置きの共通 test フォルダへ逃がさない。
+- API を実装対象に含み、backend component 一式がそろっている場合は、DB 接続付き API 結合テストを `api/tests/http-integration/` か既存 harness へ追加する。
 - Nest token や interface は複数実装切り替えが本当に必要なときだけ導入する。
 - `openapi.yml` や async contract に書かれた transport 名を domain 内部へ漏らさない。
+- TypeScript の API 実装で snake-case のファイル名を新規追加しない。
 
 ## アンチパターン
 
@@ -195,3 +209,5 @@ export class AuditLogPresenter {
 - `api` / `apps/api` を fat service 化する。
 - 責務の曖昧な `shared` / `common` に何でも入れる。
 - 対象コンポーネントから離れた共通 `tests/` `specs/` フォルダへユニットテストを置く。
+- backend component がそろう前に API 結合テストを書き始める。
+- `@nestjs/testing` と `supertest` を使う API 結合テストなのに、Repository や DB を mock へ置き換える。

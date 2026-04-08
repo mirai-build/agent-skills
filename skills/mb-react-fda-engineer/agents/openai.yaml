@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド React FDAエンジニア"
+  short_description: "React の FDA 構成で責務分離し、TanStack Start と Next で実装を進める"
+  default_prompt: "$mb-react-fda-engineer を使って、対象リポジトリの既存構成、利用ライブラリ、フレームワークを確認し、React の FDA 原則と profile 別ルールに沿って実装を進めて下さい。ライブラリ追加や変更が必要なら先にユーザーへ確認して下さい。"

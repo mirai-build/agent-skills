@@ -16,6 +16,8 @@ SKILLS_DIR = REPO_ROOT / "skills"
 USER_SKILLS_DIR = Path.home() / ".agents" / "skills"
 RENAMED_SKILL_DIRECTORIES: dict[str, tuple[str, ...]] = {
     "mb-ddd-architect": ("mb-domain-driven-design",),
+    # React FDA Skill は旧名称からの置き換えで 1 つにそろえる。
+    "mb-react-fda-engineer": ("mb-fda-frontend-engineer",),
 }
 
 

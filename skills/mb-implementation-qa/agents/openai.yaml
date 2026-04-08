@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド 実装Q&A"
+  short_description: "現状コードを棚卸しし、実装方針相談や実装確認へ根拠つきで答える"
+  default_prompt: "$mb-implementation-qa を使って、まず現在のリポジトリ実装を確認し、質問に直接関係する entrypoint・型・呼び出し元・類似実装・テストだけを絞って調べて下さい。`mb-ddd-architect-qa` が利用可能で `docs/designs` がある場合は設計書も照合し、実装との差分を明示して下さい。回答は日本語で `結論` `根拠` `次の一手` の順にまとめ、観測事実と推測を分けて下さい。"

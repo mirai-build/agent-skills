@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド 文書ダウンローダー"
+  short_description: "対象 SaaS の文書を取得し Markdown 化してローカル保存する"
+  default_prompt: "$mb-document-downloader を使って、対象 SaaS の文書ページを取得し、Markdown に変換してローカルリポジトリへ保存して下さい。まず provider を確認し、Confluence の場合は ATLASSIAN_TOKEN を環境変数から参照し、必要に応じて ATLASSIAN_EMAIL / ATLASSIAN_USER_EMAIL や Cloud ID も使って下さい。保存先パス、provider、取得した文書 ID、失敗時の不足設定を短く整理して報告して下さい。"

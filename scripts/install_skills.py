@@ -18,6 +18,8 @@ RENAMED_SKILL_DIRECTORIES: dict[str, tuple[str, ...]] = {
     "mb-ddd-architect": ("mb-domain-driven-design",),
     # React FDA Skill は旧名称からの置き換えで 1 つにそろえる。
     "mb-react-fda-engineer": ("mb-fda-frontend-engineer",),
+    # 文書ダウンローダーは Confluence 専用 Skill を一般化して置き換える。
+    "mb-document-downloader": ("mb-confluence-downloader",),
 }
 
 

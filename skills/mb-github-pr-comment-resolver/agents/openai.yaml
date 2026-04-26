@@ -1,0 +1,4 @@
+interface:
+  display_name: "ミライビルド GitHub PRコメントリゾルバー"
+  short_description: "GitHub PRの未解決コメントを分析し方針確認後にresolveまで進める"
+  default_prompt: "$mb-github-pr-comment-resolver を使って、指定された GitHub PR URL の未解決コメントを分析し、ユーザーの対応判断を受けて修正・コメント・resolve まで日本語で進めて下さい。"

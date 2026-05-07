@@ -1,0 +1,4 @@
+interface:
+  display_name: "汎用PR作成"
+  short_description: "任意のGitHubリポジトリでPR本文と確認手順を標準化する"
+  default_prompt: "$mb-create-pr を使って、対象リポジトリに合わせた日本語PR本文を作成し、必要ならPR作成まで進めて下さい。"

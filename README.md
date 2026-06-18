@@ -5,7 +5,7 @@
 
 ## 同梱スキル
 
-現在同梱している Skill は 13 個です。
+現在同梱している Skill は 14 個です。
 最新の一覧は `python3 scripts/install_skills.py --list` でも確認できます。
 
 - `skill-creator`
@@ -24,6 +24,10 @@
   - 表示名は `ミライビルド GitHub PRコメントリゾルバー` です。
   - GitHub PR の未解決 review thread を分析し、方針確認後に修正、返信、resolve まで進める Skill です。
   - `skills/mb-github-pr-comment-resolver/` に同梱しています。
+- `mb-pr-review`
+  - 表示名は `ミライビルド PRレビュワー` です。
+  - GitHub 上の PR またはローカルブランチ差分を、コーディングガイド確認と 3 パスレビューで P1/P2/P3 に分けて徹底レビューする Skill です。
+  - `skills/mb-pr-review/` に同梱しています。
 - `mb-ddd-architect`
   - 表示名は `ミライビルド DDDアーキテクト` です。
   - DDD に沿って不足情報を質問しながら、`docs/designs/` 配下の設計書を段階的に整備する Skill です。
@@ -85,6 +89,7 @@ python3 scripts/install_skills.py --mode home \
   --skill mb-git-clean-branches \
   --skill mb-git-rebase \
   --skill mb-github-pr-comment-resolver \
+  --skill mb-pr-review \
   --skill mb-ddd-architect \
   --skill mb-ddd-architect-qa \
   --skill mb-ddd-architect-reviewer \
@@ -114,6 +119,7 @@ python3 scripts/install_skills.py --mode repo --repo-path /path/to/target-repo \
   --skill mb-git-clean-branches \
   --skill mb-git-rebase \
   --skill mb-github-pr-comment-resolver \
+  --skill mb-pr-review \
   --skill mb-ddd-architect \
   --skill mb-ddd-architect-qa \
   --skill mb-ddd-architect-reviewer \

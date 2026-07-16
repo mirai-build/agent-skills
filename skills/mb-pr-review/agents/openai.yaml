@@ -1,4 +1,4 @@
 interface:
   display_name: "ミライビルド PRレビュワー"
-  short_description: "GitHub PRとブランチ差分を徹底レビューし、P1-P3で指摘する"
-  default_prompt: "$mb-pr-review を使って、GitHub PRまたはローカルブランチ差分を対象に、コーディングガイドを確認したうえで3パスのコードレビューを行い、P1/P2/P3で日本語報告して下さい。"
+  short_description: "責務分離とReadable Codeを含む必須レンズでPR差分をレビューする"
+  default_prompt: "$mb-pr-review を使って、PRまたはブランチ差分を正しさ、責務分離、Readable Code、テスト容易性の必須レンズで3パスレビューし、検証後にP1/P2/P3で日本語報告して下さい。"
